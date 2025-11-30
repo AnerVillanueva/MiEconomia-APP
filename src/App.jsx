@@ -233,42 +233,25 @@ function App() {
           <div style={{ width: '25%', padding: '0 4px' }} className="swipe-area">
             <div style={movimientosStyles.container}>
               <h3 style={movimientosStyles.title}>Todos los Movimientos</h3>
-              {transactions.length === 0 ? (
+              {filteredTransactions.length === 0 ? (
                 <div style={movimientosStyles.empty}>No hay movimientos</div>
               ) : (
-                (() => {
-                  // Group transactions by category only, calculating net balance
-                  const groupedMovements = transactions.reduce((acc, tx) => {
-                    const existing = acc.find(item => item.category === tx.category);
-
-                    if (existing) {
-                      // Add to balance: income is positive, expense is negative
-                      existing.balance += tx.type === 'income' ? tx.amount : -tx.amount;
-                    } else {
-                      acc.push({
-                        category: tx.category,
-                        balance: tx.type === 'income' ? tx.amount : -tx.amount,
-                        id: tx.category
-                      });
-                    }
-
-                    return acc;
-                  }, []);
-
-                  return groupedMovements.map((mov) => (
-                    <div key={mov.id} style={movimientosStyles.item}>
-                      <div style={movimientosStyles.itemLeft}>
-                        <div style={movimientosStyles.category}>{mov.category}</div>
-                      </div>
-                      <div style={{
-                        ...movimientosStyles.amount,
-                        color: mov.balance === 0 ? 'var(--text-white)' : (mov.balance > 0 ? 'var(--income-green)' : 'var(--expense-red)')
-                      }}>
-                        {mov.balance === 0 ? '' : (mov.balance > 0 ? '+' : '')}{mov.balance.toLocaleString('es-ES')} €
+                filteredTransactions.map((tx) => (
+                  <div key={tx.id} style={movimientosStyles.item}>
+                    <div style={movimientosStyles.itemLeft}>
+                      <div style={movimientosStyles.category}>{tx.category}</div>
+                      <div style={movimientosStyles.date}>
+                        {tx.date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })} • {tx.date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
                       </div>
                     </div>
-                  ));
-                })()
+                    <div style={{
+                      ...movimientosStyles.amount,
+                      color: tx.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
+                    }}>
+                      {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('es-ES')} €
+                    </div>
+                  </div>
+                ))
               )}
             </div>
           </div>
@@ -319,6 +302,11 @@ const movimientosStyles = {
     fontSize: '14px',
     fontWeight: '700',
     color: 'var(--text-white)',
+  },
+  date: {
+    fontSize: '12px',
+    color: 'var(--text-gray)',
+    fontWeight: '500',
   },
   amount: {
     fontSize: '16px',

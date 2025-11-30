@@ -13,8 +13,8 @@ const SummaryChart = ({ income, expense, total }) => {
     ? [{ name: 'Empty', value: 1, color: '#444' }]
     : data;
 
-  const expensePct = total === 0 ? 0 : Math.round((expense / (income + expense)) * 100) || 0;
-  const incomePct = total === 0 ? 0 : Math.round((income / (income + expense)) * 100) || 0;
+  const expensePct = (income + expense) === 0 ? 0 : Math.round((expense / (income + expense)) * 100) || 0;
+  const incomePct = (income + expense) === 0 ? 0 : Math.round((income / (income + expense)) * 100) || 0;
 
   return (
     <div style={styles.card}>
