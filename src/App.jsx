@@ -16,28 +16,31 @@ function App() {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
-  const [dragDirection, setDragDirection] = useState(null); // 'horizontal' | 'vertical' | null
+  const [dragDirection, setDragDirection] = useState(null);
   const [dragOffset, setDragOffset] = useState(0);
 
-  const [transactions, setTransactions] = useState([
-    { id: 1, category: 'JUEGOS', amount: 10, type: 'expense', date: new Date() },
-    { id: 2, category: 'COMIDA', amount: 8.5, type: 'expense', date: new Date() },
-    { id: 3, category: 'NEGOCIOS', amount: 3500, type: 'income', date: new Date() },
-    { id: 4, category: 'GASOLINA', amount: 50, type: 'expense', date: new Date() },
-    { id: 5, category: 'CASA', amount: 0, type: 'expense', date: new Date() },
-    { id: 6, category: 'TELEFONO', amount: 0, type: 'expense', date: new Date() },
-  ]);
+  const [transactions, setTransactions] = useState(() => {
+    const savedTransactions = localStorage.getItem('mieconomia-transactions');
+    return savedTransactions ? JSON.parse(savedTransactions).map(t => ({
+      ...t,
+      date: new Date(t.date)
+    })) : [];
+  });
 
-  const [theme, setTheme] = useState('dark');
   const [activeTab, setActiveTab] = useState('resumen');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('expense');
   const [searchTerm, setSearchTerm] = useState('');
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
+  // Save transactions to localStorage whenever they change
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
-  }, [theme]);
+    localStorage.setItem('mieconomia-transactions', JSON.stringify(transactions));
+  }, [transactions]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', 'dark');
+  }, []);
 
   useEffect(() => {
     const root = document.getElementById('root');
@@ -46,7 +49,6 @@ function App() {
     }
   }, []);
 
-  // Derived State
   const totalIncome = transactions
     .filter(t => t.type === 'income')
     .reduce((acc, curr) => acc + curr.amount, 0);
@@ -57,7 +59,6 @@ function App() {
 
   const balance = totalIncome - totalExpense;
 
-  // Notifications Logic
   const notifications = [];
   if (totalExpense > 500) {
     notifications.push({ message: '¡Alerta! Has superado los 500€ en gastos.' });
@@ -91,7 +92,6 @@ function App() {
   };
 
   const handleMouseDown = (e) => {
-    // Don't interfere with buttons, inputs, or the horizontal slider
     if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
       return;
     }
@@ -119,15 +119,13 @@ function App() {
 
   const handleMouseUp = (e) => {
     if (isDragging && dragDirection === 'horizontal') {
-      const threshold = 100; // Drag threshold to switch
+      const threshold = 80;
       const tabs = ['resumen', 'mes', 'año', 'movimientos'];
       const currentIndex = tabs.indexOf(activeTab);
 
       if (dragOffset > threshold && currentIndex > 0) {
-        // Swipe Right -> Previous Tab
         setActiveTab(tabs[currentIndex - 1]);
       } else if (dragOffset < -threshold && currentIndex < tabs.length - 1) {
-        // Swipe Left -> Next Tab
         setActiveTab(tabs[currentIndex + 1]);
       }
     }
@@ -149,16 +147,15 @@ function App() {
     const dx = x - startX;
     const dy = y - startY;
 
-    // Determine direction if not yet locked
     if (!dragDirection) {
-      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
-        if (e.target.closest('.swipe-area')) {
+      const isSwipeArea = e.target.closest('.swipe-area');
+
+      if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
+        if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
           setDragDirection('horizontal');
         } else {
           setDragDirection('vertical');
         }
-      } else if (Math.abs(dy) > 10) {
-        setDragDirection('vertical');
       }
     }
 
@@ -167,7 +164,7 @@ function App() {
       const walk = (dy) * 1.5;
       appRef.current.scrollTop = scrollTop - walk;
     } else if (dragDirection === 'horizontal') {
-      e.preventDefault(); // Prevent text selection etc
+      e.preventDefault();
       setDragOffset(dx);
     }
   };
@@ -193,8 +190,6 @@ function App() {
     <>
       <Header
         balance={balance}
-        theme={theme}
-        setTheme={setTheme}
         onNotificationClick={() => setIsNotificationsOpen(true)}
         notificationCount={notifications.length}
       />
@@ -215,7 +210,6 @@ function App() {
           transform: `translateX(calc(-${getTabIndex(activeTab) * 25}% + ${dragOffset}px))`,
           transition: isDragging && dragDirection === 'horizontal' ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}>
-          {/* Section 1: Resumen */}
           <div style={{ width: '25%', padding: '0 4px' }}>
             <div className="swipe-area">
               <SummaryChart income={totalIncome} expense={totalExpense} total={balance} />
@@ -224,50 +218,63 @@ function App() {
             <MovementsSlider movements={filteredTransactions} />
           </div>
 
-          {/* Section 2: Mes */}
           <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
             <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ color: 'var(--text-gray)' }}>Sección Mes (En construcción)</div>
             </div>
           </div>
 
-          {/* Section 3: Año */}
           <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
             <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
               <div style={{ color: 'var(--text-gray)' }}>Sección Año (En construcción)</div>
             </div>
           </div>
 
-          {/* Section 4: Movimientos */}
           <div style={{ width: '25%', padding: '0 4px' }} className="swipe-area">
             <div style={movimientosStyles.container}>
               <h3 style={movimientosStyles.title}>Todos los Movimientos</h3>
               {transactions.length === 0 ? (
                 <div style={movimientosStyles.empty}>No hay movimientos</div>
               ) : (
-                transactions.map((tx) => (
-                  <div key={tx.id} style={movimientosStyles.item}>
-                    <div style={movimientosStyles.itemLeft}>
-                      <div style={movimientosStyles.category}>{tx.category}</div>
-                      <div style={movimientosStyles.date}>
-                        {new Date(tx.date).toLocaleDateString('es-ES')} {new Date(tx.date).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                (() => {
+                  // Group transactions by category and type, summing amounts
+                  const groupedMovements = transactions.reduce((acc, tx) => {
+                    const existing = acc.find(item => item.category === tx.category && item.type === tx.type);
+
+                    if (existing) {
+                      existing.amount += tx.amount;
+                    } else {
+                      acc.push({
+                        category: tx.category,
+                        amount: tx.amount,
+                        type: tx.type,
+                        id: tx.category + tx.type
+                      });
+                    }
+
+                    return acc;
+                  }, []);
+
+                  return groupedMovements.map((mov) => (
+                    <div key={mov.id} style={movimientosStyles.item}>
+                      <div style={movimientosStyles.itemLeft}>
+                        <div style={movimientosStyles.category}>{mov.category}</div>
+                      </div>
+                      <div style={{
+                        ...movimientosStyles.amount,
+                        color: mov.amount === 0 ? 'var(--text-white)' : (mov.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)')
+                      }}>
+                        {mov.amount === 0 ? '' : (mov.type === 'income' ? '+' : '-')}{mov.amount.toLocaleString('es-ES')} €
                       </div>
                     </div>
-                    <div style={{
-                      ...movimientosStyles.amount,
-                      color: tx.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
-                    }}>
-                      {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('es-ES')} €
-                    </div>
-                  </div>
-                ))
+                  ));
+                })()
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* SearchBar fixed at bottom - outside sliding container */}
       <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
 
       <AddTransactionModal
@@ -312,10 +319,6 @@ const movimientosStyles = {
     fontSize: '14px',
     fontWeight: '700',
     color: 'var(--text-white)',
-  },
-  date: {
-    fontSize: '12px',
-    color: 'var(--text-gray)',
   },
   amount: {
     fontSize: '16px',

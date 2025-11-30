@@ -22,24 +22,6 @@
   --stats-icon-color: #121212;
 }
 
-[data-theme="light"] {
-  /* Light Theme Overrides */
-  --bg-dark: #F2F2F7;
-  --bg-card: #FFFFFF;
-  --bg-card-lighter: #E5E5EA;
-  --glass-bg: rgba(255, 255, 255, 0.8);
-  --glass-border: rgba(0, 0, 0, 0.05);
-  --glass-shine: radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 50%);
-  --text-white: #000000;
-  --text-gray: #666666;
-  --icon-color: #000000;
-  --stats-icon-bg: #E0E0E0;
-  --stats-icon-color: #000000;
-  --primary-lime: #AACC00;
-  --pill-expense: rgba(255, 82, 82, 1);
-  --pill-income: rgba(51, 212, 153, 1);
-}
-
 * {
   box-sizing: border-box;
   margin: 0;
@@ -122,22 +104,21 @@ input::placeholder {
   }
 }
 
-/* Custom scrollbar for webkit browsers */
+/* Custom scrollbar for webkit browsers - Gray color */
 ::-webkit-scrollbar {
-  height: 8px;
-  width: 8px;
+  height: 4px;
+  width: 4px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--bg-card);
-  border-radius: 10px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-lime);
-  borderRadius: 10px;
+  background: rgba(44, 44, 44, 0.6);
+  border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #C4EF23;
+  background: rgba(44, 44, 44, 0.8);
 }

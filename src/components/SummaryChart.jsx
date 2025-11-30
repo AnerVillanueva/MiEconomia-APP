@@ -57,16 +57,14 @@ const SummaryChart = ({ income, expense, total }) => {
       <div style={styles.stats}>
         <h4 style={styles.statsTitle}>BALANCE TOTAL</h4>
 
-        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-expense)', boxShadow: '0 4px 15px -4px rgba(255, 82, 82, 0.4)' }}>
-          <div style={styles.iconCircle}><ChevronDown size={12} color="#FF5252" /></div>
+        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-expense)' }}>
           <div style={styles.statText}>
             <span style={styles.statLabel}>GASTOS</span>
             <span style={styles.statValue}>{expensePct}%</span>
           </div>
         </div>
 
-        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-income)', boxShadow: '0 4px 15px -4px rgba(51, 212, 153, 0.4)' }}>
-          <div style={{ ...styles.iconCircle, backgroundColor: 'rgba(0,0,0,0.1)' }}><ChevronDown size={12} color="#121212" /></div>
+        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-income)' }}>
           <div style={styles.statText}>
             <span style={{ ...styles.statLabel, color: '#121212' }}>INGRESOS</span>
             <span style={{ ...styles.statValue, color: '#121212' }}>{incomePct}%</span>
@@ -102,9 +100,10 @@ const styles = {
   },
   divider: {
     width: '1px',
-    height: '60%',
-    backgroundColor: 'rgba(255,255,255,0.1)',
-    margin: '0 10px',
+    height: '65%',
+    background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0.15) 80%, transparent 100%)',
+    margin: '0 12px',
+    boxShadow: '0 0 8px rgba(255,255,255,0.1)',
   },
   stats: {
     flex: 1,
@@ -130,23 +129,15 @@ const styles = {
     borderRadius: '16px',
     width: '100%',
     maxWidth: '130px',
-    justifyContent: 'space-between',
-  },
-  iconCircle: {
-    width: '20px',
-    height: '20px',
-    borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.9)',
-    display: 'flex',
-    alignItems: 'center',
     justifyContent: 'center',
   },
   statText: {
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'flex-end',
+    alignItems: 'center',
     lineHeight: '1.1',
     color: 'white',
+    width: '100%',
   },
   statLabel: {
     fontSize: '8px',

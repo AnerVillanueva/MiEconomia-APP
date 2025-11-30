@@ -1,12 +1,7 @@
 import React from 'react';
-import { Sun, Moon, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 
-const Header = ({ balance, theme, setTheme, onNotificationClick, notificationCount }) => {
-  const toggleTheme = () => {
-    setTheme(theme === 'dark' ? 'light' : 'dark');
-    // In a real app, this would toggle a class on the body or root
-  };
-
+const Header = ({ balance, onNotificationClick, notificationCount }) => {
   return (
     <header style={styles.header}>
       <div style={styles.balanceContainer}>
@@ -14,10 +9,6 @@ const Header = ({ balance, theme, setTheme, onNotificationClick, notificationCou
       </div>
 
       <div style={styles.actions}>
-        <button onClick={toggleTheme} className="icon-btn">
-          {theme === 'dark' ? <Sun size={24} /> : <Moon size={24} />}
-        </button>
-
         <button className="icon-btn" style={{ position: 'relative' }} onClick={onNotificationClick}>
           <Bell size={24} />
           {notificationCount > 0 && <span style={styles.notificationDot}></span>}

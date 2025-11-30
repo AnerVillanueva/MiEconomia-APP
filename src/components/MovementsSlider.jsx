@@ -68,9 +68,9 @@ const MovementsSlider = ({ movements }) => {
           <div key={mov.id} style={styles.card}>
             <div style={{
               ...styles.amount,
-              color: mov.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
+              color: mov.amount === 0 ? 'var(--text-white)' : (mov.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)')
             }}>
-              {mov.type === 'income' ? '+' : '-'} {mov.amount.toLocaleString('es-ES')}€
+              {mov.amount === 0 ? '' : (mov.type === 'income' ? '+' : '-')} {mov.amount.toLocaleString('es-ES')}€
             </div>
             <div style={styles.category}>{mov.category}</div>
           </div>
