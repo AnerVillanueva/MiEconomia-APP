@@ -3,14 +3,19 @@
   --bg-dark: #121212;
   --bg-card: #1E1E1E;
   --bg-card-lighter: #2C2C2C;
+  --glass-bg: rgba(30, 30, 30, 0.6);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-shine: radial-gradient(circle at top left, rgba(255, 255, 255, 0.15), transparent 40%);
   --primary-lime: #D4FF33;
   --secondary-purple: #6B5B95;
-  --purple-gradient: linear-gradient(135deg, #7F7FD5, #86A8E7, #91EAE4);
+  --purple-gradient: linear-gradient(190deg, rgba(107, 91, 149, 0.9) 0%, rgba(88, 86, 214, 0.8) 100%);
   --purple-card-bg: #6B5B95;
   --text-white: #FFFFFF;
   --text-gray: #AAAAAA;
   --expense-red: #FF5252;
   --income-green: #33D499;
+  --pill-expense: rgba(255, 82, 82, 0.8);
+  --pill-income: rgba(51, 212, 153, 0.8);
   --font-family: 'Inter', sans-serif;
   --icon-color: #FFFFFF;
   --stats-icon-bg: #FFFFFF;
@@ -22,12 +27,17 @@
   --bg-dark: #F2F2F7;
   --bg-card: #FFFFFF;
   --bg-card-lighter: #E5E5EA;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.05);
+  --glass-shine: radial-gradient(circle at top left, rgba(255, 255, 255, 0.8), transparent 50%);
   --text-white: #000000;
   --text-gray: #666666;
   --icon-color: #000000;
   --stats-icon-bg: #E0E0E0;
   --stats-icon-color: #000000;
   --primary-lime: #AACC00;
+  --pill-expense: rgba(255, 82, 82, 1);
+  --pill-income: rgba(51, 212, 153, 1);
 }
 
 * {
@@ -125,7 +135,7 @@ input::placeholder {
 
 ::-webkit-scrollbar-thumb {
   background: var(--primary-lime);
-  border-radius: 10px;
+  borderRadius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {

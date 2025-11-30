@@ -13,8 +13,11 @@ import './index.css';
 function App() {
   const appRef = useRef(null);
   const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
+  const [dragDirection, setDragDirection] = useState(null); // 'horizontal' | 'vertical' | null
+  const [dragOffset, setDragOffset] = useState(0);
 
   const [transactions, setTransactions] = useState([
     { id: 1, category: 'JUEGOS', amount: 10, type: 'expense', date: new Date() },
@@ -94,22 +97,44 @@ function App() {
     }
 
     setIsDragging(true);
+    setStartX(e.pageX);
     setStartY(e.pageY - appRef.current.offsetTop);
     setScrollTop(appRef.current.scrollTop);
+    setDragDirection(null);
+    setDragOffset(0);
+
     appRef.current.style.cursor = 'grabbing';
     appRef.current.style.userSelect = 'none';
   };
 
   const handleMouseLeave = () => {
     setIsDragging(false);
+    setDragDirection(null);
+    setDragOffset(0);
     if (appRef.current) {
       appRef.current.style.cursor = 'default';
       appRef.current.style.userSelect = 'auto';
     }
   };
 
-  const handleMouseUp = () => {
+  const handleMouseUp = (e) => {
+    if (isDragging && dragDirection === 'horizontal') {
+      const threshold = 100; // Drag threshold to switch
+      const tabs = ['resumen', 'mes', 'año', 'movimientos'];
+      const currentIndex = tabs.indexOf(activeTab);
+
+      if (dragOffset > threshold && currentIndex > 0) {
+        // Swipe Right -> Previous Tab
+        setActiveTab(tabs[currentIndex - 1]);
+      } else if (dragOffset < -threshold && currentIndex < tabs.length - 1) {
+        // Swipe Left -> Next Tab
+        setActiveTab(tabs[currentIndex + 1]);
+      }
+    }
+
     setIsDragging(false);
+    setDragDirection(null);
+    setDragOffset(0);
     if (appRef.current) {
       appRef.current.style.cursor = 'default';
       appRef.current.style.userSelect = 'auto';
@@ -118,10 +143,33 @@ function App() {
 
   const handleMouseMove = (e) => {
     if (!isDragging) return;
-    e.preventDefault();
+
+    const x = e.pageX;
     const y = e.pageY - appRef.current.offsetTop;
-    const walk = (y - startY) * 1.5;
-    appRef.current.scrollTop = scrollTop - walk;
+    const dx = x - startX;
+    const dy = y - startY;
+
+    // Determine direction if not yet locked
+    if (!dragDirection) {
+      if (Math.abs(dx) > 10 && Math.abs(dx) > Math.abs(dy)) {
+        if (e.target.closest('.swipe-area')) {
+          setDragDirection('horizontal');
+        } else {
+          setDragDirection('vertical');
+        }
+      } else if (Math.abs(dy) > 10) {
+        setDragDirection('vertical');
+      }
+    }
+
+    if (dragDirection === 'vertical') {
+      e.preventDefault();
+      const walk = (dy) * 1.5;
+      appRef.current.scrollTop = scrollTop - walk;
+    } else if (dragDirection === 'horizontal') {
+      e.preventDefault(); // Prevent text selection etc
+      setDragOffset(dx);
+    }
   };
 
   useEffect(() => {
@@ -139,7 +187,7 @@ function App() {
         root.removeEventListener('mousemove', handleMouseMove);
       };
     }
-  }, [isDragging, startY, scrollTop]);
+  }, [isDragging, startY, scrollTop, activeTab, startX, dragDirection, dragOffset]);
 
   return (
     <>
@@ -164,28 +212,34 @@ function App() {
         <div style={{
           display: 'flex',
           width: '400%',
-          transform: `translateX(-${getTabIndex(activeTab) * (100 / 4)}%)`,
-          transition: 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
+          transform: `translateX(calc(-${getTabIndex(activeTab) * 25}% + ${dragOffset}px))`,
+          transition: isDragging && dragDirection === 'horizontal' ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}>
           {/* Section 1: Resumen */}
           <div style={{ width: '25%', padding: '0 4px' }}>
-            <SummaryChart income={totalIncome} expense={totalExpense} total={balance} />
-            <StatsCards income={totalIncome} expense={totalExpense} transactions={transactions} />
+            <div className="swipe-area">
+              <SummaryChart income={totalIncome} expense={totalExpense} total={balance} />
+              <StatsCards income={totalIncome} expense={totalExpense} transactions={transactions} />
+            </div>
             <MovementsSlider movements={filteredTransactions} />
           </div>
 
           {/* Section 2: Mes */}
           <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
-            <div style={{ color: 'var(--text-gray)' }}>Sección Mes (En construcción)</div>
+            <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ color: 'var(--text-gray)' }}>Sección Mes (En construcción)</div>
+            </div>
           </div>
 
           {/* Section 3: Año */}
           <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
-            <div style={{ color: 'var(--text-gray)' }}>Sección Año (En construcción)</div>
+            <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <div style={{ color: 'var(--text-gray)' }}>Sección Año (En construcción)</div>
+            </div>
           </div>
 
           {/* Section 4: Movimientos */}
-          <div style={{ width: '25%', padding: '0 4px' }}>
+          <div style={{ width: '25%', padding: '0 4px' }} className="swipe-area">
             <div style={movimientosStyles.container}>
               <h3 style={movimientosStyles.title}>Todos los Movimientos</h3>
               {transactions.length === 0 ? (
@@ -241,7 +295,11 @@ const movimientosStyles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     padding: '16px',
-    backgroundColor: 'var(--bg-card)',
+    backgroundColor: 'var(--glass-bg)',
+    backgroundImage: 'var(--glass-shine)',
+    backdropFilter: 'blur(10px)',
+    WebkitBackdropFilter: 'blur(10px)',
+    border: '1px solid var(--glass-border)',
     borderRadius: '16px',
     marginBottom: '10px',
   },

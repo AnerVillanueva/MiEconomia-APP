@@ -99,23 +99,26 @@ const styles = {
     display: 'flex',
     gap: '16px',
     marginTop: '10px',
-    alignItems: 'flex-start', // Align to top so they expand independently without stretching the other
+    alignItems: 'flex-start',
   },
   card: {
     flex: 1,
-    backgroundColor: 'var(--bg-card-lighter)',
+    backgroundColor: 'var(--glass-bg)',
+    backgroundImage: 'var(--glass-shine)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid var(--glass-border)',
     borderRadius: '24px',
     padding: '20px',
     display: 'flex',
     flexDirection: 'column',
-    // justifyContent: 'space-between', // Removed to allow content to flow
     minHeight: '140px',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
+    boxShadow: '0 10px 30px -10px rgba(0,0,0,0.1)',
   },
   expandedCard: {
-    // flex: 2, // Removed to prevent width change
-    backgroundColor: 'var(--bg-card)',
+    backgroundColor: 'var(--glass-bg)',
     border: '1px solid var(--primary-lime)',
   },
   cardHeader: {

@@ -38,33 +38,35 @@ const SummaryChart = ({ income, expense, total }) => {
                 value={`${total.toLocaleString('es-ES')} €`}
                 position="center"
                 fill="white"
-                style={{ fontSize: '16px', fontWeight: 'bold' }}
+                style={{ fontSize: '18px', fontWeight: '900' }}
               />
               <Label
                 value="TOTAL"
                 position="center"
-                dy={-20}
+                dy={-25}
                 fill="rgba(255,255,255,0.7)"
-                style={{ fontSize: '10px' }}
+                style={{ fontSize: '10px', fontWeight: '700' }}
               />
             </Pie>
           </PieChart>
         </ResponsiveContainer>
       </div>
 
+      <div style={styles.divider}></div>
+
       <div style={styles.stats}>
         <h4 style={styles.statsTitle}>BALANCE TOTAL</h4>
 
-        <div style={{ ...styles.statPill, backgroundColor: '#FF5252' }}>
-          <div style={styles.iconCircle}><ChevronDown size={12} color="white" /></div>
+        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-expense)', boxShadow: '0 4px 15px -4px rgba(255, 82, 82, 0.4)' }}>
+          <div style={styles.iconCircle}><ChevronDown size={12} color="#FF5252" /></div>
           <div style={styles.statText}>
             <span style={styles.statLabel}>GASTOS</span>
             <span style={styles.statValue}>{expensePct}%</span>
           </div>
         </div>
 
-        <div style={{ ...styles.statPill, backgroundColor: '#33D499' }}>
-          <div style={{ ...styles.iconCircle, backgroundColor: 'rgba(0,0,0,0.2)' }}><ChevronDown size={12} color="black" /></div>
+        <div style={{ ...styles.statPill, backgroundColor: 'var(--pill-income)', boxShadow: '0 4px 15px -4px rgba(51, 212, 153, 0.4)' }}>
+          <div style={{ ...styles.iconCircle, backgroundColor: 'rgba(0,0,0,0.1)' }}><ChevronDown size={12} color="#121212" /></div>
           <div style={styles.statText}>
             <span style={{ ...styles.statLabel, color: '#121212' }}>INGRESOS</span>
             <span style={{ ...styles.statValue, color: '#121212' }}>{incomePct}%</span>
@@ -78,18 +80,31 @@ const SummaryChart = ({ income, expense, total }) => {
 const styles = {
   card: {
     background: 'var(--purple-gradient)',
-    borderRadius: '24px',
+    backgroundImage: 'var(--glass-shine), var(--purple-gradient)',
+    backdropFilter: 'blur(20px)',
+    WebkitBackdropFilter: 'blur(20px)',
+    border: '1px solid rgba(255, 255, 255, 0.1)',
+    borderRadius: '30px',
     padding: '20px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
-    height: '220px',
-    marginBottom: '16px', // Moved margin here from wrapper
+    height: '240px',
+    marginBottom: '16px',
+    boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.3)',
+    position: 'relative',
+    overflow: 'hidden',
   },
   chartContainer: {
-    flex: 1,
+    flex: 1.2,
     height: '100%',
-    minWidth: '150px',
+    minWidth: '140px',
+  },
+  divider: {
+    width: '1px',
+    height: '60%',
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    margin: '0 10px',
   },
   stats: {
     flex: 1,
@@ -97,14 +112,16 @@ const styles = {
     flexDirection: 'column',
     gap: '12px',
     alignItems: 'flex-end',
+    paddingRight: '10px',
   },
   statsTitle: {
-    fontSize: '12px',
-    fontWeight: '800',
-    letterSpacing: '1px',
+    fontSize: '11px',
+    fontWeight: '900',
+    letterSpacing: '1.5px',
     marginBottom: '4px',
     marginRight: '4px',
     color: 'white',
+    opacity: 0.9,
   },
   statPill: {
     display: 'flex',
@@ -112,15 +129,14 @@ const styles = {
     padding: '8px 12px',
     borderRadius: '16px',
     width: '100%',
-    maxWidth: '140px',
+    maxWidth: '130px',
     justifyContent: 'space-between',
-    boxShadow: '0 4px 10px rgba(0,0,0,0.2)',
   },
   iconCircle: {
     width: '20px',
     height: '20px',
     borderRadius: '50%',
-    backgroundColor: 'rgba(255,255,255,0.3)',
+    backgroundColor: 'rgba(255,255,255,0.9)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -133,13 +149,14 @@ const styles = {
     color: 'white',
   },
   statLabel: {
-    fontSize: '10px',
-    fontWeight: '700',
+    fontSize: '8px',
+    fontWeight: '800',
     opacity: 0.9,
+    marginBottom: '2px',
   },
   statValue: {
     fontSize: '14px',
-    fontWeight: '800',
+    fontWeight: '900',
   }
 };
 
