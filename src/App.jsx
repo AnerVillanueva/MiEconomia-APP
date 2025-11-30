@@ -237,18 +237,18 @@ function App() {
                 <div style={movimientosStyles.empty}>No hay movimientos</div>
               ) : (
                 (() => {
-                  // Group transactions by category and type, summing amounts
+                  // Group transactions by category only, calculating net balance
                   const groupedMovements = transactions.reduce((acc, tx) => {
-                    const existing = acc.find(item => item.category === tx.category && item.type === tx.type);
+                    const existing = acc.find(item => item.category === tx.category);
 
                     if (existing) {
-                      existing.amount += tx.amount;
+                      // Add to balance: income is positive, expense is negative
+                      existing.balance += tx.type === 'income' ? tx.amount : -tx.amount;
                     } else {
                       acc.push({
                         category: tx.category,
-                        amount: tx.amount,
-                        type: tx.type,
-                        id: tx.category + tx.type
+                        balance: tx.type === 'income' ? tx.amount : -tx.amount,
+                        id: tx.category
                       });
                     }
 
@@ -262,9 +262,9 @@ function App() {
                       </div>
                       <div style={{
                         ...movimientosStyles.amount,
-                        color: mov.amount === 0 ? 'var(--text-white)' : (mov.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)')
+                        color: mov.balance === 0 ? 'var(--text-white)' : (mov.balance > 0 ? 'var(--income-green)' : 'var(--expense-red)')
                       }}>
-                        {mov.amount === 0 ? '' : (mov.type === 'income' ? '+' : '-')}{mov.amount.toLocaleString('es-ES')} €
+                        {mov.balance === 0 ? '' : (mov.balance > 0 ? '+' : '')}{mov.balance.toLocaleString('es-ES')} €
                       </div>
                     </div>
                   ));

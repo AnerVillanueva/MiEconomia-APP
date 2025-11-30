@@ -6,18 +6,18 @@ const MovementsSlider = ({ movements }) => {
   const [startX, setStartX] = useState(0);
   const [scrollLeft, setScrollLeft] = useState(0);
 
-  // Group movements by category and sum amounts
+  // Group movements by category and calculate net balance
   const groupedMovements = movements.reduce((acc, mov) => {
-    const existing = acc.find(item => item.category === mov.category && item.type === mov.type);
+    const existing = acc.find(item => item.category === mov.category);
 
     if (existing) {
-      existing.amount += mov.amount;
+      // Add to balance: income is positive, expense is negative
+      existing.balance += mov.type === 'income' ? mov.amount : -mov.amount;
     } else {
       acc.push({
         category: mov.category,
-        amount: mov.amount,
-        type: mov.type,
-        id: mov.category + mov.type // Unique key for rendering
+        balance: mov.type === 'income' ? mov.amount : -mov.amount,
+        id: mov.category
       });
     }
 
@@ -68,9 +68,9 @@ const MovementsSlider = ({ movements }) => {
           <div key={mov.id} style={styles.card}>
             <div style={{
               ...styles.amount,
-              color: mov.amount === 0 ? 'var(--text-white)' : (mov.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)')
+              color: mov.balance === 0 ? 'var(--text-white)' : (mov.balance > 0 ? 'var(--income-green)' : 'var(--expense-red)')
             }}>
-              {mov.amount === 0 ? '' : (mov.type === 'income' ? '+' : '-')} {mov.amount.toLocaleString('es-ES')}€
+              {mov.balance === 0 ? '' : (mov.balance > 0 ? '+' : '')}{mov.balance.toLocaleString('es-ES')}€
             </div>
             <div style={styles.category}>{mov.category}</div>
           </div>
