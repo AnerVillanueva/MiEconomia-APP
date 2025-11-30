@@ -7,6 +7,7 @@ import StatsCards from './components/StatsCards';
 import MovementsSlider from './components/MovementsSlider';
 import SearchBar from './components/SearchBar';
 import AddTransactionModal from './components/AddTransactionModal';
+import NotificationsPopup from './components/NotificationsPopup';
 import './index.css';
 
 function App() {
@@ -29,6 +30,7 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalType, setModalType] = useState('expense');
   const [searchTerm, setSearchTerm] = useState('');
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -51,6 +53,15 @@ function App() {
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const balance = totalIncome - totalExpense;
+
+  // Notifications Logic
+  const notifications = [];
+  if (totalExpense > 500) {
+    notifications.push({ message: '¡Alerta! Has superado los 500€ en gastos.' });
+  }
+  if (totalExpense > 1000) {
+    notifications.push({ message: '¡Cuidado! Tus gastos han superado los 1000€.' });
+  }
 
   const filteredTransactions = transactions.filter(t =>
     t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -132,7 +143,20 @@ function App() {
 
   return (
     <>
-      <Header balance={balance} theme={theme} setTheme={setTheme} />
+      <Header
+        balance={balance}
+        theme={theme}
+        setTheme={setTheme}
+        onNotificationClick={() => setIsNotificationsOpen(true)}
+        notificationCount={notifications.length}
+      />
+
+      <NotificationsPopup
+        isOpen={isNotificationsOpen}
+        onClose={() => setIsNotificationsOpen(false)}
+        notifications={notifications}
+      />
+
       <ActionButtons onOpenModal={openModal} />
       <Summary activeTab={activeTab} setActiveTab={setActiveTab} />
 
