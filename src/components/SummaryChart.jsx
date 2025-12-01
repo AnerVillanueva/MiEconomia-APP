@@ -1,8 +1,19 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { PieChart, Pie, Cell, ResponsiveContainer, Label } from 'recharts';
 import { ChevronDown } from 'lucide-react';
 
 const SummaryChart = ({ income, expense, total }) => {
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 480);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 480);
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   const data = [
     { name: 'Gastos', value: expense, color: '#FF5252' },
     { name: 'Ingresos', value: income, color: '#33D499' },
@@ -16,17 +27,22 @@ const SummaryChart = ({ income, expense, total }) => {
   const expensePct = (income + expense) === 0 ? 0 : Math.round((expense / (income + expense)) * 100) || 0;
   const incomePct = (income + expense) === 0 ? 0 : Math.round((income / (income + expense)) * 100) || 0;
 
+  // Responsive chart dimensions
+  const chartHeight = isMobile ? 160 : 200;
+  const innerRadius = isMobile ? 50 : 60;
+  const outerRadius = isMobile ? 65 : 80;
+
   return (
     <div style={styles.card}>
       <div style={styles.chartContainer}>
-        <ResponsiveContainer width="100%" height={200}>
+        <ResponsiveContainer width="100%" height={chartHeight}>
           <PieChart>
             <Pie
               data={chartData}
               cx="50%"
               cy="50%"
-              innerRadius={60}
-              outerRadius={80}
+              innerRadius={innerRadius}
+              outerRadius={outerRadius}
               paddingAngle={0}
               dataKey="value"
               stroke="none"
@@ -38,7 +54,7 @@ const SummaryChart = ({ income, expense, total }) => {
                 value={`${total.toLocaleString('es-ES')} €`}
                 position="center"
                 fill="white"
-                style={{ fontSize: '18px', fontWeight: '900' }}
+                style={{ fontSize: isMobile ? '16px' : '18px', fontWeight: '900' }}
               />
               <Label
                 value="TOTAL"
@@ -92,6 +108,13 @@ const styles = {
     boxShadow: '0 10px 30px -10px rgba(0, 0, 0, 0.3)',
     position: 'relative',
     overflow: 'hidden',
+  },
+  '@media (max-width: 480px)': {
+    card: {
+      height: '200px',
+      padding: '16px',
+      borderRadius: '24px',
+    }
   },
   chartContainer: {
     flex: 1.2,

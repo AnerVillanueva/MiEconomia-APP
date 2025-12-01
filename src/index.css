@@ -57,6 +57,14 @@ body {
   background: transparent;
 }
 
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  #root {
+    padding: 12px;
+    gap: 16px;
+  }
+}
+
 button {
   cursor: pointer;
   border: none;
@@ -121,4 +129,17 @@ input::placeholder {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(44, 44, 44, 0.8);
+}
+
+/* Utility to hide scrollbar but keep functionality */
+.hide-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+  /* Chrome, Safari and Opera */
 }

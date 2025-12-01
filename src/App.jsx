@@ -107,6 +107,22 @@ function App() {
     appRef.current.style.userSelect = 'none';
   };
 
+  const handleTouchStart = (e) => {
+    if (e.target.closest('button') || e.target.closest('input') || e.target.closest('select')) {
+      return;
+    }
+
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setStartX(touch.pageX);
+    setStartY(touch.pageY - appRef.current.offsetTop);
+    setScrollTop(appRef.current.scrollTop);
+    setDragDirection(null);
+    setDragOffset(0);
+
+    appRef.current.style.userSelect = 'none';
+  };
+
   const handleMouseLeave = () => {
     setIsDragging(false);
     setDragDirection(null);
@@ -169,6 +185,58 @@ function App() {
     }
   };
 
+  const handleTouchMove = (e) => {
+    if (!isDragging) return;
+
+    const touch = e.touches[0];
+    const x = touch.pageX;
+    const y = touch.pageY - appRef.current.offsetTop;
+    const dx = x - startX;
+    const dy = y - startY;
+
+    if (!dragDirection) {
+      const isSwipeArea = e.target.closest('.swipe-area');
+
+      if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
+        if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
+          setDragDirection('horizontal');
+        } else {
+          setDragDirection('vertical');
+        }
+      }
+    }
+
+    if (dragDirection === 'vertical') {
+      e.preventDefault();
+      const walk = (dy) * 1.5;
+      appRef.current.scrollTop = scrollTop - walk;
+    } else if (dragDirection === 'horizontal') {
+      e.preventDefault();
+      setDragOffset(dx);
+    }
+  };
+
+  const handleTouchEnd = (e) => {
+    if (isDragging && dragDirection === 'horizontal') {
+      const threshold = 80;
+      const tabs = ['resumen', 'mes', 'año', 'movimientos'];
+      const currentIndex = tabs.indexOf(activeTab);
+
+      if (dragOffset > threshold && currentIndex > 0) {
+        setActiveTab(tabs[currentIndex - 1]);
+      } else if (dragOffset < -threshold && currentIndex < tabs.length - 1) {
+        setActiveTab(tabs[currentIndex + 1]);
+      }
+    }
+
+    setIsDragging(false);
+    setDragDirection(null);
+    setDragOffset(0);
+    if (appRef.current) {
+      appRef.current.style.userSelect = 'auto';
+    }
+  };
+
   useEffect(() => {
     const root = appRef.current;
     if (root) {
@@ -176,12 +244,18 @@ function App() {
       root.addEventListener('mouseleave', handleMouseLeave);
       root.addEventListener('mouseup', handleMouseUp);
       root.addEventListener('mousemove', handleMouseMove);
+      root.addEventListener('touchstart', handleTouchStart, { passive: false });
+      root.addEventListener('touchmove', handleTouchMove, { passive: false });
+      root.addEventListener('touchend', handleTouchEnd);
 
       return () => {
         root.removeEventListener('mousedown', handleMouseDown);
         root.removeEventListener('mouseleave', handleMouseLeave);
         root.removeEventListener('mouseup', handleMouseUp);
         root.removeEventListener('mousemove', handleMouseMove);
+        root.removeEventListener('touchstart', handleTouchStart);
+        root.removeEventListener('touchmove', handleTouchMove);
+        root.removeEventListener('touchend', handleTouchEnd);
       };
     }
   }, [isDragging, startY, scrollTop, activeTab, startX, dragDirection, dragOffset]);
@@ -233,26 +307,28 @@ function App() {
           <div style={{ width: '25%', padding: '0 4px' }} className="swipe-area">
             <div style={movimientosStyles.container}>
               <h3 style={movimientosStyles.title}>Todos los Movimientos</h3>
-              {filteredTransactions.length === 0 ? (
-                <div style={movimientosStyles.empty}>No hay movimientos</div>
-              ) : (
-                filteredTransactions.map((tx) => (
-                  <div key={tx.id} style={movimientosStyles.item}>
-                    <div style={movimientosStyles.itemLeft}>
-                      <div style={movimientosStyles.category}>{tx.category}</div>
-                      <div style={movimientosStyles.date}>
-                        {tx.date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })} • {tx.date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+              <div style={movimientosStyles.scrollContainer} className="hide-scrollbar">
+                {filteredTransactions.length === 0 ? (
+                  <div style={movimientosStyles.empty}>No hay movimientos</div>
+                ) : (
+                  filteredTransactions.map((tx) => (
+                    <div key={tx.id} style={movimientosStyles.item}>
+                      <div style={movimientosStyles.itemLeft}>
+                        <div style={movimientosStyles.category}>{tx.category}</div>
+                        <div style={movimientosStyles.date}>
+                          {tx.date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })} • {tx.date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
+                        </div>
+                      </div>
+                      <div style={{
+                        ...movimientosStyles.amount,
+                        color: tx.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
+                      }}>
+                        {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('es-ES')} €
                       </div>
                     </div>
-                    <div style={{
-                      ...movimientosStyles.amount,
-                      color: tx.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
-                    }}>
-                      {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('es-ES')} €
-                    </div>
-                  </div>
-                ))
-              )}
+                  ))
+                )}
+              </div>
             </div>
           </div>
         </div>
@@ -316,6 +392,11 @@ const movimientosStyles = {
     textAlign: 'center',
     color: 'var(--text-gray)',
     padding: '40px 20px',
+  },
+  scrollContainer: {
+    height: 'calc(100vh - 200px)',
+    overflowY: 'auto',
+    paddingBottom: '80px',
   }
 };
 

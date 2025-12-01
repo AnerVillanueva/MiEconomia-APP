@@ -55,6 +55,7 @@ const styles = {
     justifyContent: 'center',
     transition: 'transform 0.1s',
     boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
+    flexShrink: 0,
   },
 };
 
