@@ -5,6 +5,9 @@ import Summary from './components/Summary';
 import SummaryChart from './components/SummaryChart';
 import StatsCards from './components/StatsCards';
 import MovementsSlider from './components/MovementsSlider';
+import MovementsList from './components/MovementsList';
+import MonthCalendar from './components/MonthCalendar';
+import YearView from './components/YearView';
 import SearchBar from './components/SearchBar';
 import AddTransactionModal from './components/AddTransactionModal';
 import NotificationsPopup from './components/NotificationsPopup';
@@ -284,7 +287,7 @@ function App() {
           transform: `translateX(calc(-${getTabIndex(activeTab) * 25}% + ${dragOffset}px))`,
           transition: isDragging && dragDirection === 'horizontal' ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}>
-          <div style={{ width: '25%', padding: '0 4px' }}>
+          <div style={{ width: '25%', padding: '0 8px' }}>
             <div className="swipe-area">
               <SummaryChart income={totalIncome} expense={totalExpense} total={balance} />
               <StatsCards income={totalIncome} expense={totalExpense} transactions={transactions} />
@@ -292,49 +295,29 @@ function App() {
             <MovementsSlider movements={filteredTransactions} />
           </div>
 
-          <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
-            <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div style={{ color: 'var(--text-gray)' }}>Sección Mes (En construcción)</div>
+          <div style={{ width: '25%', padding: '0 8px' }}>
+            <div className="swipe-area">
+              <MonthCalendar transactions={transactions} />
             </div>
           </div>
 
-          <div style={{ width: '25%', padding: '0 4px', display: 'flex', justifyContent: 'center', paddingTop: '50px' }}>
-            <div className="swipe-area" style={{ width: '100%', height: '300px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <div style={{ color: 'var(--text-gray)' }}>Sección Año (En construcción)</div>
+          <div style={{ width: '25%', padding: '0 8px' }}>
+            <div className="swipe-area">
+              <YearView transactions={transactions} />
             </div>
           </div>
 
-          <div style={{ width: '25%', padding: '0 4px' }} className="swipe-area">
-            <div style={movimientosStyles.container}>
-              <h3 style={movimientosStyles.title}>Todos los Movimientos</h3>
-              <div style={movimientosStyles.scrollContainer} className="hide-scrollbar">
-                {filteredTransactions.length === 0 ? (
-                  <div style={movimientosStyles.empty}>No hay movimientos</div>
-                ) : (
-                  filteredTransactions.map((tx) => (
-                    <div key={tx.id} style={movimientosStyles.item}>
-                      <div style={movimientosStyles.itemLeft}>
-                        <div style={movimientosStyles.category}>{tx.category}</div>
-                        <div style={movimientosStyles.date}>
-                          {tx.date.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: '2-digit' })} • {tx.date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })}
-                        </div>
-                      </div>
-                      <div style={{
-                        ...movimientosStyles.amount,
-                        color: tx.type === 'income' ? 'var(--income-green)' : 'var(--expense-red)'
-                      }}>
-                        {tx.type === 'income' ? '+' : '-'}{tx.amount.toLocaleString('es-ES')} €
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+          <div style={{ width: '25%', padding: '0 8px' }} className="swipe-area">
+            <MovementsList transactions={filteredTransactions} />
           </div>
         </div>
       </div>
 
-      <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+
+
+      {(activeTab === 'resumen' || activeTab === 'movimientos') && (
+        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
+      )}
 
       <AddTransactionModal
         isOpen={isModalOpen}
@@ -345,59 +328,5 @@ function App() {
     </>
   );
 }
-
-const movimientosStyles = {
-  container: {
-    padding: '10px 0',
-  },
-  title: {
-    fontSize: '16px',
-    fontWeight: '800',
-    color: 'var(--text-white)',
-    marginBottom: '20px',
-  },
-  item: {
-    display: 'flex',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: '16px',
-    backgroundColor: 'var(--glass-bg)',
-    backgroundImage: 'var(--glass-shine)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    border: '1px solid var(--glass-border)',
-    borderRadius: '16px',
-    marginBottom: '10px',
-  },
-  itemLeft: {
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '4px',
-  },
-  category: {
-    fontSize: '14px',
-    fontWeight: '700',
-    color: 'var(--text-white)',
-  },
-  date: {
-    fontSize: '12px',
-    color: 'var(--text-gray)',
-    fontWeight: '500',
-  },
-  amount: {
-    fontSize: '16px',
-    fontWeight: '800',
-  },
-  empty: {
-    textAlign: 'center',
-    color: 'var(--text-gray)',
-    padding: '40px 20px',
-  },
-  scrollContainer: {
-    height: 'calc(100vh - 200px)',
-    overflowY: 'auto',
-    paddingBottom: '80px',
-  }
-};
 
 export default App;

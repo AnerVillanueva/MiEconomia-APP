@@ -1,12 +1,12 @@
 import React from 'react';
-import { LayoutGrid } from 'lucide-react';
+import { Wallet } from 'lucide-react';
 
 const Summary = ({ activeTab, setActiveTab }) => {
   return (
     <div style={styles.wrapper}>
       <div style={styles.header}>
-        <h3 style={styles.title}>RESUMEN</h3>
-        <LayoutGrid size={20} color="var(--text-gray)" />
+        <h3 style={styles.title}>BALANCE</h3>
+        <Wallet size={20} color="var(--text-gray)" />
       </div>
 
       <div style={styles.tabs}>

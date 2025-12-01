@@ -28,12 +28,15 @@ const SummaryChart = ({ income, expense, total }) => {
   const incomePct = (income + expense) === 0 ? 0 : Math.round((income / (income + expense)) * 100) || 0;
 
   // Responsive chart dimensions
-  const chartHeight = isMobile ? 160 : 200;
-  const innerRadius = isMobile ? 50 : 60;
-  const outerRadius = isMobile ? 65 : 80;
+  const chartHeight = isMobile ? 140 : 200;
+  const innerRadius = isMobile ? 45 : 60;
+  const outerRadius = isMobile ? 60 : 80;
 
   return (
-    <div style={styles.card}>
+    <div style={{
+      ...styles.card,
+      ...(isMobile ? styles.mobileCard : {})
+    }}>
       <div style={styles.chartContainer}>
         <ResponsiveContainer width="100%" height={chartHeight}>
           <PieChart>
@@ -109,24 +112,26 @@ const styles = {
     position: 'relative',
     overflow: 'hidden',
   },
-  '@media (max-width: 480px)': {
-    card: {
-      height: '200px',
-      padding: '16px',
-      borderRadius: '24px',
-    }
+  mobileCard: {
+    height: '180px',
+    padding: '12px',
+    borderRadius: '24px',
   },
   chartContainer: {
-    flex: 1.2,
+    flex: 1,
     height: '100%',
-    minWidth: '140px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: '120px',
   },
   divider: {
     width: '1px',
     height: '65%',
     background: 'linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.15) 20%, rgba(255,255,255,0.15) 80%, transparent 100%)',
-    margin: '0 12px',
+    margin: '0 8px',
     boxShadow: '0 0 8px rgba(255,255,255,0.1)',
+    flexShrink: 0,
   },
   stats: {
     flex: 1,
@@ -134,7 +139,7 @@ const styles = {
     flexDirection: 'column',
     gap: '12px',
     alignItems: 'flex-end',
-    paddingRight: '10px',
+    paddingRight: '4px',
   },
   statsTitle: {
     fontSize: '11px',

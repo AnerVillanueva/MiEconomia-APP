@@ -87,6 +87,7 @@ const styles = {
     gap: '12px',
     marginTop: '10px',
     overflow: 'hidden',
+    paddingBottom: '100px',
   },
   title: {
     fontSize: '14px',

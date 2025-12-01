@@ -21,7 +21,7 @@ const SearchBar = ({ searchTerm, setSearchTerm }) => {
 const styles = {
   container: {
     position: 'fixed',
-    bottom: '20px',
+    bottom: '30px',
     left: '50%',
     transform: 'translateX(-50%)',
     width: 'calc(100% - 40px)',
@@ -29,7 +29,6 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
     backgroundColor: 'transparent',
-    padding: '6px',
     zIndex: 100,
   },
   input: {

@@ -112,6 +112,20 @@ input::placeholder {
   }
 }
 
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    max-height: 200px;
+    transform: translateY(0);
+  }
+}
+
 /* Custom scrollbar for webkit browsers - Gray color */
 ::-webkit-scrollbar {
   height: 4px;
