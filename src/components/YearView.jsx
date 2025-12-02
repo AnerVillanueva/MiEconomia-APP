@@ -1,8 +1,138 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const YearView = ({ transactions }) => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
+  const scrollRef = useRef(null);
+  const [isDragging, setIsDragging] = useState(false);
+  const [startX, setStartX] = useState(0);
+  const [startY, setStartY] = useState(0);
+  const [scrollTop, setScrollTop] = useState(0);
+  const [dragDirection, setDragDirection] = useState(null); // 'vertical' or 'horizontal'
+
+  const handleMouseDown = (e) => {
+    if (e.target.closest('button')) return;
+    setIsDragging(true);
+    setStartX(e.pageX);
+    setStartY(e.pageY);
+    setScrollTop(scrollRef.current.scrollTop);
+    setDragDirection(null);
+    if (scrollRef.current) {
+      scrollRef.current.style.cursor = 'grabbing';
+      scrollRef.current.style.userSelect = 'none';
+    }
+  };
+
+  const handleTouchStart = (e) => {
+    if (e.target.closest('button')) return;
+    const touch = e.touches[0];
+    setIsDragging(true);
+    setStartX(touch.pageX);
+    setStartY(touch.pageY);
+    setScrollTop(scrollRef.current.scrollTop);
+    setDragDirection(null);
+    if (scrollRef.current) {
+      scrollRef.current.style.userSelect = 'none';
+    }
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isDragging || !scrollRef.current) return;
+    const touch = e.touches[0];
+    const x = touch.pageX;
+    const y = touch.pageY;
+    const dx = Math.abs(x - startX);
+    const dy = Math.abs(y - startY);
+
+    // Determine direction on first significant movement
+    if (!dragDirection && (dx > 10 || dy > 10)) {
+      if (dy > dx) {
+        setDragDirection('vertical');
+      } else {
+        setDragDirection('horizontal');
+        setIsDragging(false); // Release control for horizontal swipe
+        return;
+      }
+    }
+
+    // Only handle vertical scrolling
+    if (dragDirection === 'vertical') {
+      e.preventDefault();
+      const walk = (startY - y) * 1.5;
+      scrollRef.current.scrollTop = scrollTop + walk;
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDragging(false);
+    setDragDirection(null);
+    if (scrollRef.current) {
+      scrollRef.current.style.cursor = 'grab';
+      scrollRef.current.style.userSelect = 'auto';
+    }
+  };
+
+  const handleTouchEnd = () => {
+    setIsDragging(false);
+    setDragDirection(null);
+    if (scrollRef.current) {
+      scrollRef.current.style.userSelect = 'auto';
+    }
+  };
+
+  useEffect(() => {
+    const handleGlobalMouseMove = (e) => {
+      if (!isDragging || !scrollRef.current) return;
+
+      const x = e.pageX;
+      const y = e.pageY;
+      const dx = Math.abs(x - startX);
+      const dy = Math.abs(y - startY);
+
+      // Determine direction on first significant movement
+      if (!dragDirection && (dx > 10 || dy > 10)) {
+        if (dy > dx) {
+          setDragDirection('vertical');
+        } else {
+          setDragDirection('horizontal');
+          setIsDragging(false); // Release control for horizontal swipe
+          if (scrollRef.current) {
+            scrollRef.current.style.cursor = 'grab';
+            scrollRef.current.style.userSelect = 'auto';
+          }
+          return;
+        }
+      }
+
+      // Only handle vertical scrolling
+      if (dragDirection === 'vertical') {
+        e.preventDefault();
+        const walk = (startY - y) * 1.5;
+        scrollRef.current.scrollTop = scrollTop + walk;
+      }
+    };
+
+    const handleGlobalMouseUp = () => {
+      if (isDragging) {
+        setIsDragging(false);
+        setDragDirection(null);
+        if (scrollRef.current) {
+          scrollRef.current.style.cursor = 'grab';
+          scrollRef.current.style.userSelect = 'auto';
+        }
+      }
+    };
+
+    if (isDragging) {
+      document.addEventListener('mousemove', handleGlobalMouseMove);
+      document.addEventListener('mouseup', handleGlobalMouseUp);
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleGlobalMouseMove);
+      document.removeEventListener('mouseup', handleGlobalMouseUp);
+    };
+  }, [isDragging, startX, startY, scrollTop, dragDirection]);
 
   const monthNames = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
@@ -131,88 +261,89 @@ const YearView = ({ transactions }) => {
         </button>
       </div>
 
-      <div style={styles.monthsGrid}>
-        {monthNames.map((monthName, index) => {
-          const balance = getMonthlyBalance(index);
-          const isCurrent = isCurrentMonth(index);
+      <div
+        ref={scrollRef}
+        style={styles.scrollableContent}
+        className="hide-scrollbar"
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+        onTouchMove={handleTouchMove}
+      >
+        <div style={styles.monthsGrid}>
+          {monthNames.map((monthName, index) => {
+            const balance = getMonthlyBalance(index);
+            const isCurrent = isCurrentMonth(index);
 
-          return (
-            <div
-              key={index}
-              style={{
-                ...styles.monthCard,
-                border: isCurrent
-                  ? '2px solid var(--primary-lime)'
-                  : '1px solid var(--glass-border)',
-              }}
-            >
-              <div style={styles.monthHeader}>
-                <span style={styles.monthName}>{monthNamesShort[index]}</span>
-                <span style={{
-                  ...styles.monthBalance,
-                  color: balance >= 0 ? 'var(--income-green)' : 'var(--expense-red)',
-                  opacity: balance === 0 ? 0.5 : 1
-                }}>
-                  {balance === 0 ? '-' : `${balance > 0 ? '+' : ''}${Math.round(balance)}€`}
-                </span>
+            return (
+              <div
+                key={index}
+                style={{
+                  ...styles.monthCard,
+                  border: isCurrent
+                    ? '2px solid var(--primary-lime)'
+                    : '1px solid var(--glass-border)',
+                }}
+              >
+                <div style={styles.monthHeader}>
+                  <span style={styles.monthName}>{monthNamesShort[index]}</span>
+                  <span style={{
+                    ...styles.monthBalance,
+                    color: balance >= 0 ? 'var(--income-green)' : 'var(--expense-red)',
+                    opacity: balance === 0 ? 0.5 : 1
+                  }}>
+                    {balance === 0 ? '-' : `${balance > 0 ? '+' : ''}${Math.round(balance)}€`}
+                  </span>
+                </div>
+
+                {renderMiniCalendar(index)}
               </div>
+            );
+          })}
+        </div>
 
-              {renderMiniCalendar(index)}
+
+        <div style={styles.summary}>
+          <div style={styles.summaryTitle}>Resumen Anual</div>
+          <div style={styles.summaryStats}>
+            <div style={styles.summaryItem}>
+              <span style={styles.summaryLabel}>Total Ingresos</span>
+              <span style={{ ...styles.summaryValue, color: 'var(--income-green)' }}>
+                +{transactions
+                  .filter(t => t.type === 'income' && new Date(t.date).getFullYear() === currentYear)
+                  .reduce((acc, t) => acc + t.amount, 0)
+                  .toLocaleString('es-ES')}€
+              </span>
             </div>
-          );
-        })}
-      </div>
-
-      <div style={styles.legend}>
-        <div style={styles.legendItem}>
-          <div style={{ ...styles.legendColor, background: 'var(--expense-red)' }}></div>
-          <span style={styles.legendText}>Gastos</span>
-        </div>
-        <div style={styles.legendItem}>
-          <div style={{ ...styles.legendColor, background: 'var(--income-green)' }}></div>
-          <span style={styles.legendText}>Ingresos</span>
-        </div>
-      </div>
-
-      <div style={styles.summary}>
-        <div style={styles.summaryTitle}>Resumen Anual</div>
-        <div style={styles.summaryStats}>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>Total Ingresos</span>
-            <span style={{ ...styles.summaryValue, color: 'var(--income-green)' }}>
-              +{transactions
-                .filter(t => t.type === 'income' && new Date(t.date).getFullYear() === currentYear)
-                .reduce((acc, t) => acc + t.amount, 0)
-                .toLocaleString('es-ES')}€
-            </span>
-          </div>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>Total Gastos</span>
-            <span style={{ ...styles.summaryValue, color: 'var(--expense-red)' }}>
-              -{transactions
-                .filter(t => t.type === 'expense' && new Date(t.date).getFullYear() === currentYear)
-                .reduce((acc, t) => acc + t.amount, 0)
-                .toLocaleString('es-ES')}€
-            </span>
-          </div>
-          <div style={styles.summaryItem}>
-            <span style={styles.summaryLabel}>Balance Anual</span>
-            <span style={{
-              ...styles.summaryValue,
-              color: (() => {
-                const yearBalance = transactions
-                  .filter(t => new Date(t.date).getFullYear() === currentYear)
-                  .reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
-                return yearBalance >= 0 ? 'var(--income-green)' : 'var(--expense-red)';
-              })()
-            }}>
-              {(() => {
-                const yearBalance = transactions
-                  .filter(t => new Date(t.date).getFullYear() === currentYear)
-                  .reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
-                return `${yearBalance >= 0 ? '+' : ''}${yearBalance.toLocaleString('es-ES')}€`;
-              })()}
-            </span>
+            <div style={styles.summaryItem}>
+              <span style={styles.summaryLabel}>Total Gastos</span>
+              <span style={{ ...styles.summaryValue, color: 'var(--expense-red)' }}>
+                -{transactions
+                  .filter(t => t.type === 'expense' && new Date(t.date).getFullYear() === currentYear)
+                  .reduce((acc, t) => acc + t.amount, 0)
+                  .toLocaleString('es-ES')}€
+              </span>
+            </div>
+            <div style={styles.summaryItem}>
+              <span style={styles.summaryLabel}>Balance Anual</span>
+              <span style={{
+                ...styles.summaryValue,
+                color: (() => {
+                  const yearBalance = transactions
+                    .filter(t => new Date(t.date).getFullYear() === currentYear)
+                    .reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
+                  return yearBalance >= 0 ? 'var(--income-green)' : 'var(--expense-red)';
+                })()
+              }}>
+                {(() => {
+                  const yearBalance = transactions
+                    .filter(t => new Date(t.date).getFullYear() === currentYear)
+                    .reduce((acc, t) => t.type === 'income' ? acc + t.amount : acc - t.amount, 0);
+                  return `${yearBalance >= 0 ? '+' : ''}${yearBalance.toLocaleString('es-ES')}€`;
+                })()}
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -225,6 +356,7 @@ const styles = {
     padding: '0',
     paddingBottom: '80px',
     height: '100%',
+    maxHeight: 'calc(100vh - 200px)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -257,14 +389,22 @@ const styles = {
     textAlign: 'center',
     letterSpacing: '1px',
   },
+  scrollableContent: {
+    flex: 1,
+    overflowY: 'auto',
+    overflowX: 'hidden',
+    padding: '4px',
+    paddingBottom: '20px',
+    cursor: 'grab',
+    userSelect: 'none',
+    WebkitOverflowScrolling: 'touch',
+    minHeight: 0,
+  },
   monthsGrid: {
     display: 'grid',
     gridTemplateColumns: 'repeat(3, 1fr)',
     gap: '8px',
     marginBottom: '16px',
-    flex: 1,
-    overflowY: 'auto',
-    padding: '4px',
   },
   monthCard: {
     display: 'flex',
@@ -313,34 +453,7 @@ const styles = {
     aspectRatio: '1',
     width: '100%',
   },
-  legend: {
-    display: 'flex',
-    justifyContent: 'center',
-    gap: '12px',
-    marginBottom: '12px',
-    padding: '10px',
-    background: 'var(--glass-bg)',
-    backgroundImage: 'var(--glass-shine)',
-    backdropFilter: 'blur(10px)',
-    WebkitBackdropFilter: 'blur(10px)',
-    border: '1px solid var(--glass-border)',
-    borderRadius: '12px',
-  },
-  legendItem: {
-    display: 'flex',
-    alignItems: 'center',
-    gap: '6px',
-  },
-  legendColor: {
-    width: '10px',
-    height: '10px',
-    borderRadius: '50%',
-  },
-  legendText: {
-    fontSize: '9px',
-    color: 'var(--text-gray)',
-    fontWeight: '600',
-  },
+
   summary: {
     background: 'var(--glass-bg)',
     backgroundImage: 'var(--glass-shine)',
