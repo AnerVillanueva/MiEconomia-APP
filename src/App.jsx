@@ -19,6 +19,7 @@ function App() {
   const [startX, setStartX] = useState(0);
   const [startY, setStartY] = useState(0);
   const [scrollTop, setScrollTop] = useState(0);
+  const [movementsScrollTop, setMovementsScrollTop] = useState(0);
   const [dragDirection, setDragDirection] = useState(null);
   const [dragOffset, setDragOffset] = useState(0);
 
@@ -52,6 +53,7 @@ function App() {
     }
   }, []);
 
+  // Historical Balance (for Header)
   const totalIncome = transactions
     .filter(t => t.type === 'income')
     .reduce((acc, curr) => acc + curr.amount, 0);
@@ -61,6 +63,26 @@ function App() {
     .reduce((acc, curr) => acc + curr.amount, 0);
 
   const balance = totalIncome - totalExpense;
+
+  // Monthly Balance (for SummaryChart and StatsCards)
+  const now = new Date();
+  const currentMonth = now.getMonth();
+  const currentYear = now.getFullYear();
+
+  const currentMonthTransactions = transactions.filter(t => {
+    const d = new Date(t.date);
+    return d.getMonth() === currentMonth && d.getFullYear() === currentYear;
+  });
+
+  const monthIncome = currentMonthTransactions
+    .filter(t => t.type === 'income')
+    .reduce((acc, curr) => acc + curr.amount, 0);
+
+  const monthExpense = currentMonthTransactions
+    .filter(t => t.type === 'expense')
+    .reduce((acc, curr) => acc + curr.amount, 0);
+
+  const monthBalance = monthIncome - monthExpense;
 
   const notifications = [];
   if (totalExpense > 500) {
@@ -99,10 +121,17 @@ function App() {
       return;
     }
 
+    const movementsContainer = e.target.closest('.movements-scroll-container');
+
     setIsDragging(true);
     setStartX(e.pageX);
     setStartY(e.pageY - appRef.current.offsetTop);
     setScrollTop(appRef.current.scrollTop);
+
+    if (movementsContainer) {
+      setMovementsScrollTop(movementsContainer.scrollTop);
+    }
+
     setDragDirection(null);
     setDragOffset(0);
 
@@ -115,25 +144,22 @@ function App() {
       return;
     }
 
+    const movementsContainer = e.target.closest('.movements-scroll-container');
     const touch = e.touches[0];
+
     setIsDragging(true);
     setStartX(touch.pageX);
     setStartY(touch.pageY - appRef.current.offsetTop);
     setScrollTop(appRef.current.scrollTop);
+
+    if (movementsContainer) {
+      setMovementsScrollTop(movementsContainer.scrollTop);
+    }
+
     setDragDirection(null);
     setDragOffset(0);
 
     appRef.current.style.userSelect = 'none';
-  };
-
-  const handleMouseLeave = () => {
-    setIsDragging(false);
-    setDragDirection(null);
-    setDragOffset(0);
-    if (appRef.current) {
-      appRef.current.style.cursor = 'default';
-      appRef.current.style.userSelect = 'auto';
-    }
   };
 
   const handleMouseUp = (e) => {
@@ -168,10 +194,13 @@ function App() {
 
     if (!dragDirection) {
       const isSwipeArea = e.target.closest('.swipe-area');
+      const movementsScrollContainer = e.target.closest('.movements-scroll-container');
 
       if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
         if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
           setDragDirection('horizontal');
+        } else if (movementsScrollContainer) {
+          setDragDirection('vertical-movements');
         } else {
           setDragDirection('vertical');
         }
@@ -182,6 +211,13 @@ function App() {
       e.preventDefault();
       const walk = (dy) * 1.5;
       appRef.current.scrollTop = scrollTop - walk;
+    } else if (dragDirection === 'vertical-movements') {
+      e.preventDefault();
+      const movementsScrollContainer = document.querySelector('.movements-scroll-container');
+      if (movementsScrollContainer) {
+        const walk = (e.pageY - (startY + appRef.current.offsetTop)) * 1.5;
+        movementsScrollContainer.scrollTop = movementsScrollTop - walk;
+      }
     } else if (dragDirection === 'horizontal') {
       e.preventDefault();
       setDragOffset(dx);
@@ -199,10 +235,13 @@ function App() {
 
     if (!dragDirection) {
       const isSwipeArea = e.target.closest('.swipe-area');
+      const movementsScrollContainer = e.target.closest('.movements-scroll-container');
 
       if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
         if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
           setDragDirection('horizontal');
+        } else if (movementsScrollContainer) {
+          setDragDirection('vertical-movements');
         } else {
           setDragDirection('vertical');
         }
@@ -213,6 +252,13 @@ function App() {
       e.preventDefault();
       const walk = (dy) * 1.5;
       appRef.current.scrollTop = scrollTop - walk;
+    } else if (dragDirection === 'vertical-movements') {
+      e.preventDefault();
+      const movementsScrollContainer = document.querySelector('.movements-scroll-container');
+      if (movementsScrollContainer) {
+        const walk = (touch.pageY - (startY + appRef.current.offsetTop)) * 1.5;
+        movementsScrollContainer.scrollTop = movementsScrollTop - walk;
+      }
     } else if (dragDirection === 'horizontal') {
       e.preventDefault();
       setDragOffset(dx);
@@ -244,24 +290,24 @@ function App() {
     const root = appRef.current;
     if (root) {
       root.addEventListener('mousedown', handleMouseDown);
-      root.addEventListener('mouseleave', handleMouseLeave);
-      root.addEventListener('mouseup', handleMouseUp);
-      root.addEventListener('mousemove', handleMouseMove);
       root.addEventListener('touchstart', handleTouchStart, { passive: false });
       root.addEventListener('touchmove', handleTouchMove, { passive: false });
       root.addEventListener('touchend', handleTouchEnd);
 
+      // Add mouse events to document to capture events even outside the app
+      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mousemove', handleMouseMove);
+
       return () => {
         root.removeEventListener('mousedown', handleMouseDown);
-        root.removeEventListener('mouseleave', handleMouseLeave);
-        root.removeEventListener('mouseup', handleMouseUp);
-        root.removeEventListener('mousemove', handleMouseMove);
         root.removeEventListener('touchstart', handleTouchStart);
         root.removeEventListener('touchmove', handleTouchMove);
         root.removeEventListener('touchend', handleTouchEnd);
+        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('mousemove', handleMouseMove);
       };
     }
-  }, [isDragging, startY, scrollTop, activeTab, startX, dragDirection, dragOffset]);
+  }, [isDragging, startY, scrollTop, movementsScrollTop, activeTab, startX, dragDirection, dragOffset]);
 
   return (
     <>
@@ -289,8 +335,13 @@ function App() {
         }}>
           <div style={{ width: '25%', padding: '0 8px' }}>
             <div className="swipe-area">
-              <SummaryChart income={totalIncome} expense={totalExpense} total={balance} />
-              <StatsCards income={totalIncome} expense={totalExpense} transactions={transactions} />
+              <SummaryChart
+                income={monthIncome}
+                expense={monthExpense}
+                total={monthBalance}
+                transactions={currentMonthTransactions}
+              />
+              <StatsCards income={monthIncome} expense={monthExpense} transactions={currentMonthTransactions} />
             </div>
             <MovementsSlider movements={filteredTransactions} />
           </div>
@@ -307,13 +358,11 @@ function App() {
             </div>
           </div>
 
-          <div style={{ width: '25%', padding: '0 8px' }} className="swipe-area">
+          <div style={{ width: '25%', padding: '0 8px' }}>
             <MovementsList transactions={filteredTransactions} />
           </div>
         </div>
       </div>
-
-
 
       {(activeTab === 'resumen' || activeTab === 'movimientos') && (
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />

@@ -3,115 +3,20 @@ import { ChevronDown, ChevronUp } from 'lucide-react';
 
 const MovementsList = ({ transactions }) => {
   const scrollRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startY, setStartY] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
   const [expandedId, setExpandedId] = useState(null);
-  const [clickStartY, setClickStartY] = useState(0);
-
-  const handleMouseDown = (e) => {
-    setIsDragging(true);
-    setStartY(e.pageY - scrollRef.current.offsetTop);
-    setScrollTop(scrollRef.current.scrollTop);
-    setClickStartY(e.pageY);
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grabbing';
-      scrollRef.current.style.userSelect = 'none';
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    const touch = e.touches[0];
-    setIsDragging(true);
-    setStartY(touch.pageY - scrollRef.current.offsetTop);
-    setScrollTop(scrollRef.current.scrollTop);
-    setClickStartY(touch.pageY);
-    if (scrollRef.current) {
-      scrollRef.current.style.userSelect = 'none';
-    }
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging) return;
-    e.preventDefault();
-    const y = e.pageY - scrollRef.current.offsetTop;
-    const walk = (y - startY) * 1.5;
-    scrollRef.current.scrollTop = scrollTop - walk;
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging) return;
-    const touch = e.touches[0];
-    const y = touch.pageY - scrollRef.current.offsetTop;
-    const walk = (y - startY) * 1.5;
-    scrollRef.current.scrollTop = scrollTop - walk;
-  };
-
-  const handleMouseUp = (e) => {
-    const dragDistance = Math.abs(e.pageY - clickStartY);
-    setIsDragging(false);
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grab';
-      scrollRef.current.style.userSelect = 'auto';
-    }
-    // If drag distance is small, it's a click
-    return dragDistance < 5;
-  };
-
-  const handleTouchEnd = (e) => {
-    const touch = e.changedTouches[0];
-    const dragDistance = Math.abs(touch.pageY - clickStartY);
-    setIsDragging(false);
-    if (scrollRef.current) {
-      scrollRef.current.style.userSelect = 'auto';
-    }
-    // If drag distance is small, it's a tap
-    return dragDistance < 5;
-  };
 
   const handleItemClick = (e, txId, hasDescription) => {
-    // Prevent click if user was dragging
-    const dragDistance = Math.abs(e.pageY - clickStartY) + Math.abs(e.pageX - (e.pageX));
-    if (dragDistance > 5) return;
-
     if (!hasDescription) return;
     setExpandedId(expandedId === txId ? null : txId);
   };
 
-  // Add global mouse up listener to handle mouse up outside the container
-  useEffect(() => {
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        setIsDragging(false);
-        if (scrollRef.current) {
-          scrollRef.current.style.cursor = 'grab';
-          scrollRef.current.style.userSelect = 'auto';
-        }
-      }
-    };
-
-    if (isDragging) {
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-      document.addEventListener('mousemove', handleMouseMove);
-    }
-
-    return () => {
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-      document.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, [isDragging, startY, scrollTop]);
-
   return (
-    <div style={styles.container}>
+    <div style={styles.container} className="swipe-area">
       <h3 style={styles.title}>Todos los Movimientos</h3>
       <div
         ref={scrollRef}
         style={styles.scrollContainer}
-        className="hide-scrollbar"
-        onMouseDown={handleMouseDown}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
+        className="hide-scrollbar movements-scroll-container"
       >
         {transactions.length === 0 ? (
           <div style={styles.empty}>No hay movimientos</div>
@@ -180,8 +85,6 @@ const styles = {
     height: 'calc(100vh - 200px)',
     overflowY: 'auto',
     paddingBottom: '120px',
-    cursor: 'grab',
-    userSelect: 'none',
     WebkitOverflowScrolling: 'touch',
   },
   item: {

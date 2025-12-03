@@ -55,6 +55,7 @@ body {
   overflow-y: auto;
   overflow-x: hidden;
   background: transparent;
+  touch-action: pan-y;
 }
 
 /* Mobile responsive adjustments */

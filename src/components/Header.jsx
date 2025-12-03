@@ -36,10 +36,7 @@ const styles = {
   balanceContainer: {
     flex: 1,
     textAlign: 'center',
-    // We need to offset the center to account for the right-side actions if we want it perfectly centered relative to screen, 
-    // but flex-1 pushes it. Let's use absolute centering or just flex.
-    // Given the design, the balance is big and central.
-    marginLeft: '60px', // Rough offset to balance the right icons
+    marginLeft: '60px',
   },
   balance: {
     fontSize: '32px',
