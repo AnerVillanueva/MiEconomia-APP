@@ -1,6 +1,20 @@
 # MiEconomia - Aplicación de Finanzas Personales
 
-Una aplicación web progresiva (PWA) para gestionar tus finanzas personales de forma sencilla y eficiente.
+<div align="center">
+
+![MiEconomia](public/pwa-192x192.png)
+
+**Una aplicación web progresiva (PWA) para gestionar tus finanzas personales de forma sencilla y eficiente.**
+
+[![Descargar APK](https://img.shields.io/badge/Descargar-APK%20v1.0.0-brightgreen?style=for-the-badge&logo=android)](https://github.com/AnerVillanueva/MiEconomia-APP/releases/latest)
+[![Versión](https://img.shields.io/badge/versión-1.0.0-blue?style=for-the-badge)](https://github.com/AnerVillanueva/MiEconomia-APP/releases)
+[![Licencia](https://img.shields.io/badge/licencia-MIT-orange?style=for-the-badge)](LICENSE)
+
+[📥 Descargar APK](https://github.com/AnerVillanueva/MiEconomia-APP/releases/latest) • [🌐 Ver Demo](https://tu-app.vercel.app) • [📖 Documentación](releases/README.md)
+
+</div>
+
+---
 
 ## 🚀 Características
 
@@ -13,14 +27,21 @@ Una aplicación web progresiva (PWA) para gestionar tus finanzas personales de f
 - 🔍 Búsqueda de transacciones
 - 💾 Almacenamiento local (tus datos permanecen en tu dispositivo)
 
-## 📱 Descargar APK para Android
+## 📱 Descargar e Instalar
 
-### Opción 1: Descargar APK Pre-generada (Más Fácil)
+### 📥 Descarga Directa (Recomendado)
 
-1. Ve a la sección [Releases](https://github.com/AnerVillanueva/MiEconomia-APP/releases) de este repositorio
-2. Descarga el archivo `MiEconomia.apk` de la última versión
-3. Instala la APK en tu dispositivo Android
-   - Puede que necesites habilitar "Instalar aplicaciones de fuentes desconocidas" en la configuración de tu dispositivo
+**[⬇️ Descargar MiEconomia APK v1.0.0](https://github.com/AnerVillanueva/MiEconomia-APP/releases/latest)**
+
+1. Haz clic en el enlace de arriba
+2. Descarga el archivo `MiEconomia-v1.0.0.apk`
+3. Abre el archivo en tu dispositivo Android
+4. Permite la instalación desde fuentes desconocidas si se solicita
+5. ¡Listo! La app estará instalada en tu dispositivo
+
+> 📖 **Instrucciones detalladas:** Ver [releases/README.md](releases/README.md)
+
+### 🌐 Instalar como PWA (Sin Descargar APK)
 
 ### Opción 2: Generar APK con PWA Builder
 

@@ -20,5 +20,14 @@ dist-ssr
 *.suo
 *.ntvs*
 *.njsproj
-*.sln
 *.sw?
+
+# APK files (use GitHub Releases instead)
+*.apk
+*.aab
+
+# Android build files
+android/
+android-twa/app/
+.gradle/
+
