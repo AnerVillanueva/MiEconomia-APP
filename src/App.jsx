@@ -11,6 +11,7 @@ import YearView from './components/YearView';
 import SearchBar from './components/SearchBar';
 import AddTransactionModal from './components/AddTransactionModal';
 import NotificationsPopup from './components/NotificationsPopup';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import './index.css';
 
 function App() {
@@ -374,6 +375,7 @@ function App() {
         onAdd={handleAddTransaction}
         type={modalType}
       />
+      <PWAInstallPrompt />
     </>
   );
 }
