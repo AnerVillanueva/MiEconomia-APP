@@ -13,14 +13,6 @@ const Header = ({ balance, onNotificationClick, notificationCount }) => {
           <Bell size={24} />
           {notificationCount > 0 && <span style={styles.notificationDot}></span>}
         </button>
-
-        <div style={styles.profile}>
-          <img
-            src="https://i.pravatar.cc/150?img=11"
-            alt="Profile"
-            style={styles.avatar}
-          />
-        </div>
       </div>
     </header>
   );
@@ -36,7 +28,7 @@ const styles = {
   balanceContainer: {
     flex: 1,
     textAlign: 'center',
-    marginLeft: '60px',
+    marginLeft: '40px',
   },
   balance: {
     fontSize: '32px',

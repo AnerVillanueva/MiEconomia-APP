@@ -49,8 +49,12 @@ const YearView = ({ transactions }) => {
       if (dy > dx) {
         setDragDirection('vertical');
       } else {
+        // For horizontal swipes, completely release control to parent
         setDragDirection('horizontal');
-        setIsDragging(false); // Release control for horizontal swipe
+        setIsDragging(false);
+        if (scrollRef.current) {
+          scrollRef.current.style.userSelect = 'auto';
+        }
         return;
       }
     }
