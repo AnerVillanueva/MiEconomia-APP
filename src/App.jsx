@@ -48,6 +48,30 @@ function App() {
     document.documentElement.setAttribute('data-theme', 'dark');
   }, []);
 
+  // Handle app shortcuts
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const action = params.get('action');
+    const view = params.get('view');
+
+    if (action === 'add-expense') {
+      setModalType('expense');
+      setIsModalOpen(true);
+      // Limpiar URL sin recargar
+      window.history.replaceState({}, '', '/');
+    } else if (action === 'add-income') {
+      setModalType('income');
+      setIsModalOpen(true);
+      // Limpiar URL sin recargar
+      window.history.replaceState({}, '', '/');
+    } else if (view === 'balance') {
+      setActiveTab('resumen');
+      // Limpiar URL sin recargar
+      window.history.replaceState({}, '', '/');
+    }
+  }, []);
+
+
   useEffect(() => {
     const root = document.getElementById('root');
     if (root) {

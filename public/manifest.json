@@ -30,24 +30,39 @@
     {
       "name": "Añadir Gasto",
       "short_name": "Gasto",
-      "description": "Añadir un nuevo gasto",
+      "description": "Registrar un nuevo gasto rápidamente",
       "url": "/?action=add-expense",
       "icons": [
         {
-          "src": "/pwa-192x192.png",
-          "sizes": "192x192"
+          "src": "/expense-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     },
     {
       "name": "Añadir Ingreso",
       "short_name": "Ingreso",
-      "description": "Añadir un nuevo ingreso",
+      "description": "Registrar un nuevo ingreso rápidamente",
       "url": "/?action=add-income",
       "icons": [
         {
+          "src": "/income-shortcut.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
+    },
+    {
+      "name": "Ver Balance",
+      "short_name": "Balance",
+      "description": "Ver tu balance actual",
+      "url": "/?view=balance",
+      "icons": [
+        {
           "src": "/pwa-192x192.png",
-          "sizes": "192x192"
+          "sizes": "192x192",
+          "type": "image/png"
         }
       ]
     }
