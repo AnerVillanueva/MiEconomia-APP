@@ -12,6 +12,7 @@ import SearchBar from './components/SearchBar';
 import AddTransactionModal from './components/AddTransactionModal';
 import NotificationsPopup from './components/NotificationsPopup';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { UpdateNotification } from './components/UpdateNotification';
 import './index.css';
 
 function App() {
@@ -376,6 +377,7 @@ function App() {
         type={modalType}
       />
       <PWAInstallPrompt />
+      <UpdateNotification />
     </>
   );
 }
