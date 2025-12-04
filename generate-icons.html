@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Generador de Iconos PNG</title>
+</head>
+
+<body>
+  <canvas id="canvas192" width="192" height="192"></canvas>
+  <canvas id="canvas512" width="512" height="512"></canvas>
+  <canvas id="canvasExpense" width="192" height="192"></canvas>
+  <canvas id="canvasIncome" width="192" height="192"></canvas>
+
+  <script>
+    // Icono principal 192x192
+    const ctx192 = document.getElementById('canvas192').getContext('2d');
+    ctx192.fillStyle = '#121212';
+    ctx192.fillRect(0, 0, 192, 192);
+    ctx192.fillStyle = '#D4FF33';
+    ctx192.font = 'bold 120px Arial';
+    ctx192.textAlign = 'center';
+    ctx192.textBaseline = 'middle';
+    ctx192.fillText('€', 96, 96);
+
+    // Icono principal 512x512
+    const ctx512 = document.getElementById('canvas512').getContext('2d');
+    ctx512.fillStyle = '#121212';
+    ctx512.fillRect(0, 0, 512, 512);
+    ctx512.fillStyle = '#D4FF33';
+    ctx512.font = 'bold 320px Arial';
+    ctx512.textAlign = 'center';
+    ctx512.textBaseline = 'middle';
+    ctx512.fillText('€', 256, 256);
+
+    // Icono de gasto (rojo con -)
+    const ctxExpense = document.getElementById('canvasExpense').getContext('2d');
+    ctxExpense.fillStyle = '#FF5252';
+    ctxExpense.beginPath();
+    ctxExpense.arc(96, 96, 96, 0, Math.PI * 2);
+    ctxExpense.fill();
+    ctxExpense.fillStyle = '#FFFFFF';
+    ctxExpense.font = 'bold 100px Arial';
+    ctxExpense.textAlign = 'center';
+    ctxExpense.textBaseline = 'middle';
+    ctxExpense.fillText('−', 96, 96);
+
+    // Icono de ingreso (verde con +)
+    const ctxIncome = document.getElementById('canvasIncome').getContext('2d');
+    ctxIncome.fillStyle = '#33D499';
+    ctxIncome.beginPath();
+    ctxIncome.arc(96, 96, 96, 0, Math.PI * 2);
+    ctxIncome.fill();
+    ctxIncome.fillStyle = '#FFFFFF';
+    ctxIncome.font = 'bold 100px Arial';
+    ctxIncome.textAlign = 'center';
+    ctxIncome.textBaseline = 'middle';
+    ctxIncome.fillText('+', 96, 96);
+
+    // Descargar iconos
+    setTimeout(() => {
+      document.getElementById('canvas192').toBlob(blob => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'pwa-192x192.png';
+        a.click();
+      });
+
+      setTimeout(() => {
+        document.getElementById('canvas512').toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'pwa-512x512.png';
+          a.click();
+        });
+      }, 500);
+
+      setTimeout(() => {
+        document.getElementById('canvasExpense').toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'expense-shortcut.png';
+          a.click();
+        });
+      }, 1000);
+
+      setTimeout(() => {
+        document.getElementById('canvasIncome').toBlob(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'income-shortcut.png';
+          a.click();
+        });
+      }, 1500);
+    }, 100);
+  </script>
+</body>
+
+</html>
