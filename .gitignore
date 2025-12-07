@@ -27,10 +27,15 @@ dist-ssr
 *.aab
 
 # Capacitor native projects
-android/
-ios/
-!android/app/src/main/res/
-!ios/App/App/Assets.xcassets/
+# Permitimos subir las carpetas de plataformas para mantener la configuración
+# android/
+# ios/
+
+# Ignorar builds nativos y dependencias
+android/app/build/
+android/.gradle/
+ios/App/App/build/
+ios/App/Pods/
 
 # Android build files
 android-twa/app/
