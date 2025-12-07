@@ -4,158 +4,269 @@ description: Cómo generar una APK descargable de la aplicación
 
 # Generar APK de MiEconomia
 
-## ⚠️ Requisito Previo: Desplegar la Aplicación
+## 🎯 Método Recomendado: Capacitor + Android Studio
 
-Antes de generar la APK, **debes desplegar tu aplicación en internet con HTTPS**. 
+Tu app ya está configurada con **Capacitor**, lo que te permite generar APKs nativas de alta calidad.
 
-### Desplegar en Vercel (Gratis):
-1. Ve a [vercel.com](https://vercel.com) e inicia sesión con GitHub
-2. Haz clic en "Add New Project"
-3. Selecciona el repositorio `MiEconomia-APP`
-4. Haz clic en "Deploy"
-5. Copia la URL generada (ej: `https://mi-economia-app.vercel.app`)
+### Requisitos Previos:
+1. **Android Studio** - [Descargar aquí](https://developer.android.com/studio)
+2. **Java JDK 17** - [Descargar aquí](https://adoptium.net/)
 
 ---
 
-## Método 1: GoNative.io (⭐ RECOMENDADO - Más Fácil)
+## 📦 Pasos para Generar APK
 
-**Ventajas:** No requiere instalaciones, interfaz visual, APK lista en minutos.
-
-### Pasos:
-1. Ve a [gonative.io](https://gonative.io)
-2. Crea una cuenta gratuita
-3. Haz clic en "Create New App"
-4. Introduce los datos:
-   - **App Name:** MiEconomia
-   - **Website URL:** [Tu URL de Vercel]
-   - **Package Name:** com.mieconomia.app
-5. En la sección "Design":
-   - Sube el icono desde `public/pwa-512x512.png`
-   - Configura colores si deseas
-6. En "Settings":
-   - Activa "Full Screen Mode"
-   - Activa "Hide Navigation Bar"
-7. Haz clic en "Build" → "Android"
-8. Espera 5-10 minutos
-9. Descarga la APK generada
-
-**Nota:** La versión gratuita incluye una pequeña marca de agua de GoNative.
-
----
-
-## Método 2: WebToAPK.com (Gratis, Sin Registro)
-
-**Ventajas:** Rápido, sin necesidad de cuenta.
-
-### Pasos:
-1. Ve a [webtoapk.com](https://webtoapk.com)
-2. Introduce:
-   - **Website URL:** [Tu URL de Vercel]
-   - **App Name:** MiEconomia
-   - **Package Name:** com.mieconomia.app
-3. Sube el icono desde `public/pwa-512x512.png`
-4. Haz clic en "Generate APK"
-5. Descarga la APK cuando esté lista
-
----
-
-## Método 3: Bubblewrap CLI (Para Desarrolladores)
-
-**Ventajas:** APK oficial de Google, sin marcas de agua, control total.
-
-**Requisitos:**
-- Node.js instalado
-- Java JDK 11 o superior
-- Android SDK
-
-### Pasos:
+### 1. Compilar la Aplicación Web
 
 // turbo
-1. Instala Bubblewrap globalmente:
 ```bash
-npm install -g @bubblewrap/cli
+npm run build
 ```
 
-2. Inicializa el proyecto TWA:
+### 2. Sincronizar con Android
+
+// turbo
 ```bash
-bubblewrap init --manifest https://[TU-URL-VERCEL]/manifest.webmanifest
+npx cap sync android
 ```
 
-3. Responde las preguntas:
-   - **Domain:** [tu-dominio.vercel.app]
-   - **Application Name:** MiEconomia
-   - **Package ID:** com.mieconomia.app
-   - **Key path:** Presiona Enter para generar una nueva
+### 3. Abrir en Android Studio
 
-4. Construye la APK:
+// turbo
 ```bash
-bubblewrap build
+npx cap open android
 ```
 
-5. La APK estará en `app-release-signed.apk`
+### 4. Generar APK en Android Studio
+
+Una vez que Android Studio se abra:
+
+1. **Espera a que Gradle termine de sincronizar** (primera vez puede tardar varios minutos)
+   - Verás un mensaje "Gradle sync in progress..." en la parte inferior
+   - Espera hasta que diga "Gradle sync finished"
+
+2. **Generar APK de Debug (para pruebas rápidas):**
+   - Ve a: `Build` → `Build Bundle(s) / APK(s)` → `Build APK(s)`
+   - Espera a que termine la compilación
+   - Click en "locate" en la notificación que aparece
+   - La APK estará en: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+3. **Generar APK Firmada (para distribución):**
+   - Ve a: `Build` → `Generate Signed Bundle / APK`
+   - Selecciona: `APK`
+   - Click en `Next`
+   
+   **Si es la primera vez:**
+   - Click en `Create new...`
+   - Elige una ubicación para tu keystore (ej: `C:\Users\TuUsuario\mieconomia-keystore.jks`)
+   - Completa los datos:
+     - **Password:** (elige una contraseña segura y guárdala)
+     - **Alias:** `mieconomia`
+     - **Password (alias):** (misma contraseña o diferente)
+     - **Validity:** 25 años
+     - **First and Last Name:** Tu nombre
+     - **Organization:** MiEconomia
+   - Click en `OK`
+   
+   **Si ya tienes keystore:**
+   - Click en `Choose existing...`
+   - Selecciona tu archivo `.jks`
+   - Introduce las contraseñas
+   
+   - Selecciona build variant: `release`
+   - Marca las casillas:
+     - ✅ V1 (Jar Signature)
+     - ✅ V2 (Full APK Signature)
+   - Click en `Finish`
+
+4. **Ubicación de la APK:**
+   ```
+   android/app/release/app-release.apk
+   ```
 
 ---
 
-## Método 4: Android Studio + TWA (Avanzado)
+## 🚀 Método Rápido: APK de Debug desde Terminal
 
-**Ventajas:** Control total, personalización completa, publicable en Play Store.
+Si solo quieres una APK rápida para pruebas:
 
-**Requisitos:**
-- Android Studio instalado
-- Java JDK 17+
+```bash
+# 1. Compilar la web
+npm run build
 
-### Pasos:
+# 2. Sincronizar con Android
+npx cap sync android
 
-1. Abre Android Studio
-2. File → New → New Project
-3. Selecciona "Empty Activity"
-4. Configura:
-   - **Name:** MiEconomia
-   - **Package name:** com.mieconomia.app
-   - **Language:** Java
-   - **Minimum SDK:** API 21
-5. Haz clic en "Finish"
+# 3. Generar APK de debug
+cd android
+./gradlew assembleDebug
+```
 
-6. Edita `build.gradle` (Module: app) y añade:
-```gradle
-dependencies {
-    implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.5.0'
+La APK estará en: `android/app/build/outputs/apk/debug/app-debug.apk`
+
+---
+
+## 📱 Instalar la APK en tu Móvil
+
+### Método 1: Transferencia Directa
+1. Copia el archivo `.apk` a tu móvil (por USB, email, Drive, etc.)
+2. Abre el archivo APK desde el explorador de archivos de tu móvil
+3. Si aparece un mensaje de seguridad:
+   - Toca "Configuración" o "Settings"
+   - Activa "Permitir de esta fuente" o "Allow from this source"
+   - Vuelve atrás y toca "Instalar"
+4. ¡Listo! La app se instalará
+
+### Método 2: ADB (Android Debug Bridge)
+Si tienes el móvil conectado por USB con depuración USB activada:
+
+```bash
+adb install android/app/build/outputs/apk/debug/app-debug.apk
+```
+
+---
+
+## 🔄 Workflow Completo de Actualización
+
+Cuando hagas cambios en tu app y quieras generar una nueva APK:
+
+```bash
+# 1. Compilar los cambios
+npm run build
+
+# 2. Sincronizar con Android
+npx cap sync android
+
+# 3. Abrir Android Studio y generar APK
+npx cap open android
+```
+
+Luego en Android Studio: `Build` → `Build Bundle(s) / APK(s)` → `Build APK(s)`
+
+---
+
+## ⚙️ Configuración Avanzada
+
+### Cambiar el Nombre de la App
+Edita: `android/app/src/main/res/values/strings.xml`
+```xml
+<string name="app_name">MiEconomia</string>
+```
+
+### Cambiar el Icono
+Los iconos se generan automáticamente desde `public/pwa-512x512.png`
+
+Para regenerar todos los recursos:
+```bash
+npx capacitor-assets generate
+```
+
+### Cambiar el Package Name
+Edita: `capacitor.config.json`
+```json
+{
+  "appId": "com.mieconomia.app"
 }
 ```
 
-7. Edita `AndroidManifest.xml` y reemplaza el contenido con el archivo en `android-twa/AndroidManifest.xml` (reemplaza `YOUR_VERCEL_URL_HERE` con tu URL)
-
-8. Sincroniza el proyecto (Sync Now)
-
-9. Build → Build Bundle(s) / APK(s) → Build APK(s)
-
-10. La APK estará en `app/build/outputs/apk/debug/app-debug.apk`
-
----
-
-## 📱 Instalar la APK en Android
-
-1. Transfiere el archivo `.apk` a tu teléfono
-2. Abre el archivo en tu teléfono
-3. Permite "Instalar desde fuentes desconocidas" si se solicita
-4. Instala la aplicación
-5. ¡Listo!
+### Incrementar la Versión
+Edita: `android/app/build.gradle`
+```gradle
+android {
+    defaultConfig {
+        versionCode 2        // Incrementa este número
+        versionName "1.1.0"  // Incrementa esta versión
+    }
+}
+```
 
 ---
 
-## 🔧 Solución de Problemas
+## 🐛 Solución de Problemas
 
-### PWA Builder no acepta mi app:
-- Verifica que tu app esté desplegada con HTTPS
-- Asegúrate de que el `manifest.json` sea accesible
-- Comprueba que los iconos estén en las rutas correctas
+### Error: "JAVA_HOME not set"
+```bash
+# Instala Java JDK 17 desde https://adoptium.net/
+# Reinicia Android Studio después de instalar
+```
 
-### La APK no se instala:
-- Verifica que hayas habilitado "Fuentes desconocidas"
-- Asegúrate de que la APK no esté corrupta
-- Intenta con otro método de generación
+### Error: "Android SDK not found"
+1. Abre Android Studio
+2. Ve a: `File` → `Settings` → `Appearance & Behavior` → `System Settings` → `Android SDK`
+3. Instala Android SDK Platform 33 o superior
+4. Click en `Apply`
 
-### La app muestra una página en blanco:
-- Verifica que la URL en la configuración sea correcta
-- Asegúrate de que la app esté desplegada y accesible
-- Comprueba que el manifest.json tenga la configuración correcta
+### Error: "Gradle build failed"
+```bash
+# Limpia el proyecto
+cd android
+./gradlew clean
+./gradlew build
+```
+
+### La app no se actualiza en el dispositivo
+1. Desinstala la versión anterior de la app
+2. Asegúrate de compilar y sincronizar:
+   ```bash
+   npm run build
+   npx cap sync android
+   ```
+3. Genera una nueva APK
+
+### Error: "Execution failed for task ':app:processDebugResources'"
+Esto suele ocurrir por recursos duplicados. Ejecuta:
+```bash
+cd android
+./gradlew clean
+```
+
+---
+
+## 🌐 Métodos Alternativos (TWA - Trusted Web Activity)
+
+Si prefieres no usar Capacitor, puedes generar una TWA que envuelve tu PWA:
+
+### Método 1: Bubblewrap CLI
+
+**Requisito:** Tu app debe estar desplegada en internet (ej: Vercel)
+
+```bash
+# Instalar Bubblewrap
+npm install -g @bubblewrap/cli
+
+# Inicializar TWA
+bubblewrap init --manifest https://tu-app.vercel.app/manifest.webmanifest
+
+# Construir APK
+bubblewrap build
+```
+
+### Método 2: PWA Builder
+
+1. Ve a [pwabuilder.com](https://www.pwabuilder.com/)
+2. Introduce la URL de tu app desplegada
+3. Click en "Start" → "Package For Stores" → "Android"
+4. Descarga el paquete generado
+
+---
+
+## 📚 Recursos Adicionales
+
+- [Documentación de Capacitor](https://capacitorjs.com/docs)
+- [Guía de Android Studio](https://developer.android.com/studio/intro)
+- [Publicar en Google Play](https://developer.android.com/distribute/console)
+- Ver también: `docs/NATIVE_APP_GUIDE.md` para más detalles
+
+---
+
+## 💡 Consejos Importantes
+
+- **Guarda tu keystore en un lugar seguro** - Si la pierdes, no podrás actualizar la app en Play Store
+- **Anota las contraseñas** - Las necesitarás para cada actualización
+- **Prueba en dispositivos reales** - Los emuladores no siempre reflejan el comportamiento real
+- **Incrementa versionCode** - Cada nueva APK debe tener un versionCode mayor
+- **Usa APK firmada para distribución** - Las APK de debug solo son para pruebas
+
+---
+
+¡Tu APK está lista para ser instalada! 🎉
