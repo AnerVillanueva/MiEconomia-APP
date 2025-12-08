@@ -18,16 +18,17 @@
     "apk:help": "node scripts/build-apk.js --help"
   },
   "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/app": "^6.0.1",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@capacitor/preferences": "^6.0.0",
+    "@capacitor/splash-screen": "^6.0.2",
+    "@capacitor/status-bar": "^6.0.1",
     "lucide-react": "^0.555.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "recharts": "^3.5.1",
-    "@capacitor/android": "^6.1.2",
-    "@capacitor/ios": "^6.1.2",
-    "@capacitor/core": "^6.1.2",
-    "@capacitor/app": "^6.0.1",
-    "@capacitor/splash-screen": "^6.0.2",
-    "@capacitor/status-bar": "^6.0.1"
+    "recharts": "^3.5.1"
   },
   "devDependencies": {
     "@capacitor/cli": "^6.1.2",

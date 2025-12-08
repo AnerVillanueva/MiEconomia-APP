@@ -13,7 +13,9 @@ import AddTransactionModal from './components/AddTransactionModal';
 import NotificationsPopup from './components/NotificationsPopup';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { UpdateNotification } from './components/UpdateNotification';
+import { App as CapacitorApp } from '@capacitor/app';
 import './index.css';
+import { Preferences } from '@capacitor/preferences';
 
 function App() {
   const appRef = useRef(null);
@@ -49,26 +51,63 @@ function App() {
   }, []);
 
   // Handle app shortcuts
+  // Handle app shortcuts (Deep Links)
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const action = params.get('action');
-    const view = params.get('view');
+    const handleDeepLink = (url) => {
+      // url could be "mieconomia://actions?type=add-expense" or "https://.../?action=add-expense"
+      // We will parse parameters from it.
+      let params;
+      try {
+        const urlObj = new URL(url);
+        params = new URLSearchParams(urlObj.search);
+      } catch (e) {
+        // Fallback or just ignore if invalid
+        console.error("Invalid URL", url);
+        return;
+      }
 
-    if (action === 'add-expense') {
-      setModalType('expense');
-      setIsModalOpen(true);
-      // Limpiar URL sin recargar
-      window.history.replaceState({}, '', '/');
-    } else if (action === 'add-income') {
-      setModalType('income');
-      setIsModalOpen(true);
-      // Limpiar URL sin recargar
-      window.history.replaceState({}, '', '/');
-    } else if (view === 'balance') {
-      setActiveTab('resumen');
-      // Limpiar URL sin recargar
-      window.history.replaceState({}, '', '/');
-    }
+      const action = params.get('action') || params.get('type'); // support both
+
+      if (action === 'add-expense') {
+        setModalType('expense');
+        setIsModalOpen(true);
+      } else if (action === 'add-income') {
+        setModalType('income');
+        setIsModalOpen(true);
+      } else if (params.get('view') === 'balance') {
+        setActiveTab('resumen');
+      }
+
+      // Clean up URL ?
+      // window.history.replaceState({}, '', '/');
+    };
+
+    // Check for launch URL (Cold Start)
+    CapacitorApp.getLaunchUrl().then(launchUrl => {
+      if (launchUrl && launchUrl.url) {
+        handleDeepLink(launchUrl.url);
+      } else {
+        // Fallback for web testing or standard window location
+        const params = new URLSearchParams(window.location.search);
+        const action = params.get('action');
+        const view = params.get('view');
+        if (action || view) {
+          // Construct a dummy full URL to reuse logic or just manual call
+          // Reuse logic:
+          const dummyUrl = `custom://dummy${window.location.search}`;
+          handleDeepLink(dummyUrl);
+        }
+      }
+    });
+
+    // Listen for future URL opens (Resume / While Running)
+    const listener = CapacitorApp.addListener('appUrlOpen', (data) => {
+      handleDeepLink(data.url);
+    });
+
+    return () => {
+      listener.then(remove => remove.remove());
+    };
   }, []);
 
 
@@ -117,6 +156,31 @@ function App() {
   if (totalExpense > 1000) {
     notifications.push({ message: '¡Cuidado! Tus gastos han superado los 1000€.' });
   }
+
+  // Widget Data Sync
+  useEffect(() => {
+    const updateWidgetData = async () => {
+      try {
+        await Preferences.set({
+          key: 'widget_balance',
+          value: balance.toString()
+        });
+        await Preferences.set({
+          key: 'widget_month_expense',
+          value: monthExpense.toString()
+        });
+        await Preferences.set({
+          key: 'widget_month_income',
+          value: monthIncome.toString()
+        });
+        // Also trigger a widget update if possible, but standard Preferences don't emit events to native easily without a listener.
+        // However, the Widget can read these values when it updates (every 30 mins or on click).
+      } catch (error) {
+        console.error('Error updating widget data:', error);
+      }
+    };
+    updateWidgetData();
+  }, [balance, monthExpense, monthIncome]);
 
   const filteredTransactions = transactions.filter(t =>
     t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
