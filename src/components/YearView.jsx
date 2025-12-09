@@ -1,143 +1,8 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 const YearView = ({ transactions }) => {
   const [currentYear, setCurrentYear] = useState(new Date().getFullYear());
-  const scrollRef = useRef(null);
-  const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [startY, setStartY] = useState(0);
-  const [scrollTop, setScrollTop] = useState(0);
-  const [dragDirection, setDragDirection] = useState(null); // 'vertical' or 'horizontal'
-
-  const handleMouseDown = (e) => {
-    if (e.target.closest('button')) return;
-    setIsDragging(true);
-    setStartX(e.pageX);
-    setStartY(e.pageY);
-    setScrollTop(scrollRef.current.scrollTop);
-    setDragDirection(null);
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grabbing';
-      scrollRef.current.style.userSelect = 'none';
-    }
-  };
-
-  const handleTouchStart = (e) => {
-    if (e.target.closest('button')) return;
-    const touch = e.touches[0];
-    setIsDragging(true);
-    setStartX(touch.pageX);
-    setStartY(touch.pageY);
-    setScrollTop(scrollRef.current.scrollTop);
-    setDragDirection(null);
-    if (scrollRef.current) {
-      scrollRef.current.style.userSelect = 'none';
-    }
-  };
-
-  const handleTouchMove = (e) => {
-    if (!isDragging || !scrollRef.current) return;
-    const touch = e.touches[0];
-    const x = touch.pageX;
-    const y = touch.pageY;
-    const dx = Math.abs(x - startX);
-    const dy = Math.abs(y - startY);
-
-    // Determine direction on first significant movement
-    if (!dragDirection && (dx > 10 || dy > 10)) {
-      if (dy > dx) {
-        setDragDirection('vertical');
-      } else {
-        // For horizontal swipes, completely release control to parent
-        setDragDirection('horizontal');
-        setIsDragging(false);
-        if (scrollRef.current) {
-          scrollRef.current.style.userSelect = 'auto';
-        }
-        return;
-      }
-    }
-
-    // Only handle vertical scrolling
-    if (dragDirection === 'vertical') {
-      e.preventDefault();
-      const walk = (startY - y) * 1.5;
-      scrollRef.current.scrollTop = scrollTop + walk;
-    }
-  };
-
-  const handleMouseUp = () => {
-    setIsDragging(false);
-    setDragDirection(null);
-    if (scrollRef.current) {
-      scrollRef.current.style.cursor = 'grab';
-      scrollRef.current.style.userSelect = 'auto';
-    }
-  };
-
-  const handleTouchEnd = () => {
-    setIsDragging(false);
-    setDragDirection(null);
-    if (scrollRef.current) {
-      scrollRef.current.style.userSelect = 'auto';
-    }
-  };
-
-  useEffect(() => {
-    const handleGlobalMouseMove = (e) => {
-      if (!isDragging || !scrollRef.current) return;
-
-      const x = e.pageX;
-      const y = e.pageY;
-      const dx = Math.abs(x - startX);
-      const dy = Math.abs(y - startY);
-
-      // Determine direction on first significant movement
-      if (!dragDirection && (dx > 10 || dy > 10)) {
-        if (dy > dx) {
-          setDragDirection('vertical');
-        } else {
-          setDragDirection('horizontal');
-          setIsDragging(false); // Release control for horizontal swipe
-          if (scrollRef.current) {
-            scrollRef.current.style.cursor = 'grab';
-            scrollRef.current.style.userSelect = 'auto';
-          }
-          return;
-        }
-      }
-
-      // Only handle vertical scrolling
-      if (dragDirection === 'vertical') {
-        e.preventDefault();
-        const walk = (startY - y) * 1.5;
-        scrollRef.current.scrollTop = scrollTop + walk;
-      }
-    };
-
-    const handleGlobalMouseUp = () => {
-      if (isDragging) {
-        setIsDragging(false);
-        setDragDirection(null);
-        if (scrollRef.current) {
-          scrollRef.current.style.cursor = 'grab';
-          scrollRef.current.style.userSelect = 'auto';
-        }
-      }
-    };
-
-    if (isDragging) {
-      document.addEventListener('mousemove', handleGlobalMouseMove);
-      document.addEventListener('mouseup', handleGlobalMouseUp);
-    }
-
-    return () => {
-      document.removeEventListener('mousemove', handleGlobalMouseMove);
-      document.removeEventListener('mouseup', handleGlobalMouseUp);
-    };
-  }, [isDragging, startX, startY, scrollTop, dragDirection]);
-
   const monthNames = [
     'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
     'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
@@ -266,14 +131,8 @@ const YearView = ({ transactions }) => {
       </div>
 
       <div
-        ref={scrollRef}
         style={styles.scrollableContent}
         className="hide-scrollbar"
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchEnd={handleTouchEnd}
-        onTouchMove={handleTouchMove}
       >
         <div style={styles.monthsGrid}>
           {monthNames.map((monthName, index) => {
@@ -359,8 +218,6 @@ const styles = {
   container: {
     padding: '0',
     paddingBottom: '80px',
-    height: '100%',
-    maxHeight: 'calc(100vh - 200px)',
     display: 'flex',
     flexDirection: 'column',
   },
@@ -369,7 +226,11 @@ const styles = {
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: '12px',
-    padding: '0 8px',
+    padding: '10px 8px',
+    position: 'sticky',
+    top: 0,
+    zIndex: 10,
+    backgroundColor: 'var(--bg-dark)', /* Ensure background covers content underneath */
   },
   navButton: {
     background: 'var(--glass-bg)',
@@ -394,13 +255,8 @@ const styles = {
     letterSpacing: '1px',
   },
   scrollableContent: {
-    flex: 1,
-    overflowY: 'auto',
-    overflowX: 'hidden',
     padding: '4px',
     paddingBottom: '20px',
-    cursor: 'grab',
-    userSelect: 'none',
     WebkitOverflowScrolling: 'touch',
     minHeight: 0,
   },

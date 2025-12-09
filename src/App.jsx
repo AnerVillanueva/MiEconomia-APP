@@ -342,26 +342,11 @@ function App() {
       if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
         if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
           setDragDirection('horizontal');
-        } else if (movementsScrollContainer) {
-          setDragDirection('vertical-movements');
-        } else {
-          setDragDirection('vertical');
         }
       }
     }
 
-    if (dragDirection === 'vertical') {
-      e.preventDefault();
-      const walk = (dy) * 1.5;
-      appRef.current.scrollTop = scrollTop - walk;
-    } else if (dragDirection === 'vertical-movements') {
-      e.preventDefault();
-      const movementsScrollContainer = document.querySelector('.movements-scroll-container');
-      if (movementsScrollContainer) {
-        const walk = (e.pageY - (startY + appRef.current.offsetTop)) * 1.5;
-        movementsScrollContainer.scrollTop = movementsScrollTop - walk;
-      }
-    } else if (dragDirection === 'horizontal') {
+    if (dragDirection === 'horizontal') {
       e.preventDefault();
       setDragOffset(dx);
     }
@@ -383,26 +368,11 @@ function App() {
       if (Math.abs(dx) > 15 || Math.abs(dy) > 15) {
         if (Math.abs(dx) > Math.abs(dy) && isSwipeArea) {
           setDragDirection('horizontal');
-        } else if (movementsScrollContainer) {
-          setDragDirection('vertical-movements');
-        } else {
-          setDragDirection('vertical');
         }
       }
     }
 
-    if (dragDirection === 'vertical') {
-      e.preventDefault();
-      const walk = (dy) * 1.5;
-      appRef.current.scrollTop = scrollTop - walk;
-    } else if (dragDirection === 'vertical-movements') {
-      e.preventDefault();
-      const movementsScrollContainer = document.querySelector('.movements-scroll-container');
-      if (movementsScrollContainer) {
-        const walk = (touch.pageY - (startY + appRef.current.offsetTop)) * 1.5;
-        movementsScrollContainer.scrollTop = movementsScrollTop - walk;
-      }
-    } else if (dragDirection === 'horizontal') {
+    if (dragDirection === 'horizontal') {
       e.preventDefault();
       setDragOffset(dx);
     }
@@ -469,15 +439,16 @@ function App() {
       <ActionButtons onOpenModal={openModal} />
       <Summary activeTab={activeTab} setActiveTab={setActiveTab} />
 
-      <div style={{ overflow: 'hidden', width: '100%' }}>
+      <div style={{ flex: 1, overflow: 'hidden', width: '100%', position: 'relative' }}>
         <div style={{
           display: 'flex',
           width: '400%',
+          height: '100%',
           transform: `translateX(calc(-${getTabIndex(activeTab) * 25}% + ${dragOffset}px))`,
           transition: isDragging && dragDirection === 'horizontal' ? 'none' : 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)'
         }}>
-          <div style={{ width: '25%', padding: '0 8px' }}>
-            <div className="swipe-area">
+          <div className="hide-scrollbar" style={{ width: '25%', padding: '0 8px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
+            <div className="swipe-area" style={{ paddingBottom: '20px' }}>
               <SummaryChart
                 income={monthIncome}
                 expense={monthExpense}
@@ -489,25 +460,25 @@ function App() {
             <MovementsSlider movements={filteredTransactions} />
           </div>
 
-          <div style={{ width: '25%', padding: '0 8px' }}>
+          <div className="hide-scrollbar" style={{ width: '25%', padding: '0 8px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div className="swipe-area">
               <MonthCalendar transactions={transactions} />
             </div>
           </div>
 
-          <div style={{ width: '25%', padding: '0 8px' }}>
+          <div className="hide-scrollbar" style={{ width: '25%', padding: '0 8px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <div className="swipe-area">
               <YearView transactions={transactions} />
             </div>
           </div>
 
-          <div style={{ width: '25%', padding: '0 8px' }}>
+          <div className="hide-scrollbar" style={{ width: '25%', padding: '0 8px', height: '100%', overflowY: 'auto', WebkitOverflowScrolling: 'touch' }}>
             <MovementsList transactions={filteredTransactions} />
           </div>
         </div>
       </div>
 
-      {(activeTab === 'resumen' || activeTab === 'movimientos') && (
+      {(activeTab === 'movimientos') && (
         <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
       )}
 

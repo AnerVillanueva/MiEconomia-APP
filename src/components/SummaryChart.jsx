@@ -29,7 +29,7 @@ const SummaryChart = ({ income, expense, total, transactions = [] }) => {
   const incomePct = (income + expense) === 0 ? 0 : Math.round((income / (income + expense)) * 100) || 0;
 
   // Responsive chart dimensions
-  const chartHeight = isMobile ? 140 : 200;
+  const chartHeight = isMobile ? 200 : 260;
   const innerRadius = isMobile ? 45 : 60;
   const outerRadius = isMobile ? 60 : 80;
 
@@ -110,7 +110,7 @@ const SummaryChart = ({ income, expense, total, transactions = [] }) => {
       style={{
         ...styles.card,
         ...(isMobile ? styles.mobileCard : {}),
-        height: isExpanded ? (isMobile ? '380px' : '440px') : (isMobile ? '180px' : '240px'),
+        height: isExpanded ? (isMobile ? '440px' : '500px') : (isMobile ? '240px' : '300px'),
         flexDirection: 'column',
         alignItems: 'stretch',
         justifyContent: 'center',

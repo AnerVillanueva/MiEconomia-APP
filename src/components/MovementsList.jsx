@@ -82,10 +82,7 @@ const styles = {
     marginBottom: '20px',
   },
   scrollContainer: {
-    height: 'calc(100vh - 200px)',
-    overflowY: 'auto',
     paddingBottom: '120px',
-    WebkitOverflowScrolling: 'touch',
   },
   item: {
     display: 'flex',

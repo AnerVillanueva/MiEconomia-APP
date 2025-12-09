@@ -52,8 +52,8 @@ body {
   gap: 20px;
   position: relative;
   max-height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  max-height: 100vh;
+  overflow: hidden;
   background: transparent;
   touch-action: pan-y;
 }
@@ -63,6 +63,7 @@ body {
   #root {
     padding: 12px;
     gap: 16px;
+    height: 100vh;
   }
 }
 
