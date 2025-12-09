@@ -14,6 +14,7 @@ import NotificationsPopup from './components/NotificationsPopup';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { UpdateNotification } from './components/UpdateNotification';
 import { App as CapacitorApp } from '@capacitor/app';
+import { Filesystem, Directory, Encoding } from '@capacitor/filesystem';
 import './index.css';
 import { Preferences } from '@capacitor/preferences';
 
@@ -156,6 +157,58 @@ function App() {
   if (totalExpense > 1000) {
     notifications.push({ message: '¡Cuidado! Tus gastos han superado los 1000€.' });
   }
+
+  // Check for pending transactions from Widget
+  const checkPendingTransactions = async () => {
+    try {
+      const file = 'pending_transactions.json';
+      const result = await Filesystem.readFile({
+        path: file,
+        directory: Directory.Data,
+        encoding: Encoding.UTF8
+      });
+
+      if (result.data) {
+        // Filesystem returns data as string for text files
+        const pending = JSON.parse(result.data);
+        if (Array.isArray(pending) && pending.length > 0) {
+          const newTransactions = pending.map(t => ({
+            ...t,
+            date: new Date(t.date) // Restore Date object
+          }));
+
+          setTransactions(prev => [...newTransactions, ...prev]);
+
+          // Clean up the file after successful import
+          await Filesystem.deleteFile({
+            path: file,
+            directory: Directory.Data
+          });
+
+          console.log('Imported pending transactions from widget', newTransactions.length);
+        }
+      }
+    } catch (e) {
+      // File missing is normal if no pending transactions
+      // console.log('No pending transactions or error reading', e);
+    }
+  };
+
+  useEffect(() => {
+    // Check on startup
+    checkPendingTransactions();
+
+    // Check on resume
+    const listener = CapacitorApp.addListener('appStateChange', ({ isActive }) => {
+      if (isActive) {
+        checkPendingTransactions();
+      }
+    });
+
+    return () => {
+      listener.then(r => r.remove());
+    };
+  }, []);
 
   // Widget Data Sync
   useEffect(() => {

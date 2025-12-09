@@ -19,10 +19,8 @@ public class QuickAddWidget extends AppWidgetProvider {
     RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.quick_add_widget);
 
     // Expense Intent
-    Intent expenseIntent = new Intent(context, MainActivity.class);
-    expenseIntent.setAction(Intent.ACTION_VIEW);
-    expenseIntent.setData(Uri.parse("mieconomia://actions?type=add-expense"));
-    // Flags needed for launching activity from widget
+    Intent expenseIntent = new Intent(context, QuickAddActivity.class);
+    expenseIntent.putExtra("type", "expense");
     expenseIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
     PendingIntent expensePendingIntent = PendingIntent.getActivity(context, 101, expenseIntent,
@@ -30,9 +28,8 @@ public class QuickAddWidget extends AppWidgetProvider {
     views.setOnClickPendingIntent(R.id.btn_add_expense, expensePendingIntent);
 
     // Income Intent
-    Intent incomeIntent = new Intent(context, MainActivity.class);
-    incomeIntent.setAction(Intent.ACTION_VIEW);
-    incomeIntent.setData(Uri.parse("mieconomia://actions?type=add-income"));
+    Intent incomeIntent = new Intent(context, QuickAddActivity.class);
+    incomeIntent.putExtra("type", "income");
     incomeIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
     PendingIntent incomePendingIntent = PendingIntent.getActivity(context, 102, incomeIntent,
