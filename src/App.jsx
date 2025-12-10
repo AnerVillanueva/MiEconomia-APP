@@ -226,6 +226,28 @@ function App() {
           key: 'widget_month_income',
           value: monthIncome.toString()
         });
+
+        // Calculate Category Totals for Radar Widget
+        const expenseCategories = {};
+        const incomeCategories = {};
+
+        currentMonthTransactions.forEach(t => {
+          if (t.type === 'expense') {
+            expenseCategories[t.category] = (expenseCategories[t.category] || 0) + t.amount;
+          } else {
+            incomeCategories[t.category] = (incomeCategories[t.category] || 0) + t.amount;
+          }
+        });
+
+        await Preferences.set({
+          key: 'widget_expense_categories',
+          value: JSON.stringify(expenseCategories)
+        });
+        await Preferences.set({
+          key: 'widget_income_categories',
+          value: JSON.stringify(incomeCategories)
+        });
+
         // Also trigger a widget update if possible, but standard Preferences don't emit events to native easily without a listener.
         // However, the Widget can read these values when it updates (every 30 mins or on click).
       } catch (error) {
@@ -233,7 +255,7 @@ function App() {
       }
     };
     updateWidgetData();
-  }, [balance, monthExpense, monthIncome]);
+  }, [balance, monthExpense, monthIncome, currentMonthTransactions]);
 
   const filteredTransactions = transactions.filter(t =>
     t.category.toLowerCase().includes(searchTerm.toLowerCase()) ||

@@ -1,53 +1,68 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="300dp"
+    android:layout_width="320dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="16dp"
-    android:background="@android:color/white">
+    android:padding="24dp"
+    android:background="@drawable/dialog_background">
 
     <TextView
         android:id="@+id/tv_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Añadir Movimiento"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         android:gravity="center"
-        android:textColor="@android:color/black"
-        android:layout_marginBottom="16dp"/>
+        android:textColor="@color/colorExpense"
+        android:layout_marginBottom="24dp"/>
 
     <EditText
         android:id="@+id/et_amount"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Cantidad (€)"
+        android:background="@drawable/input_background"
+        android:hint="0.00 €"
         android:inputType="numberDecimal"
-        android:textColor="@android:color/black"
-        android:textColorHint="@android:color/darker_gray"
-        android:layout_marginBottom="12dp"/>
+        android:padding="16dp"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:textColor="@color/colorTextWhite"
+        android:textColorHint="@color/colorTextGray"
+        android:layout_marginBottom="16dp"/>
 
     <Spinner
         android:id="@+id/spinner_category"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="12dp"
-        android:minHeight="48dp" />
+        android:background="@drawable/input_background"
+        android:padding="4dp"
+        android:layout_marginBottom="16dp"
+        android:minHeight="54dp" />
 
     <EditText
         android:id="@+id/et_description"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Descripción (opcional)"
+        android:background="@drawable/input_background"
+        android:hint="Nota (Opcional)"
         android:inputType="textCapSentences"
-        android:textColor="@android:color/black"
-        android:textColorHint="@android:color/darker_gray"
-        android:layout_marginBottom="16dp"/>
+        android:padding="16dp"
+        android:textColor="@color/colorTextWhite"
+        android:textColorHint="@color/colorTextGray"
+        android:layout_marginBottom="24dp"/>
 
     <Button
         android:id="@+id/btn_save"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Guardar"
-        android:backgroundTint="@color/colorPrimary"/>
+        android:text="Guardar Movimiento"
+        android:textAllCaps="false"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:background="@drawable/button_background"
+        android:backgroundTint="@null"/> 
+
 </LinearLayout>

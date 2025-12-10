@@ -3,6 +3,7 @@ package com.mieconomia.app;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.widget.RemoteViews;
 import java.text.NumberFormat;
@@ -20,7 +21,6 @@ public class BalanceWidget extends AppWidgetProvider {
     RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.balance_widget);
 
     // Read data from Capacitor Preferences
-    // The file name used by Capacitor Preferences is "CapacitorStorage"
     SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
 
     String balanceStr = prefs.getString("widget_balance", "0");
@@ -48,6 +48,26 @@ public class BalanceWidget extends AppWidgetProvider {
       views.setTextViewText(R.id.widget_income, incomeStr + " €");
       views.setTextViewText(R.id.widget_expense, expenseStr + " €");
     }
+
+    // PendingIntent for Add Expense
+    Intent expenseIntent = new Intent(context, QuickAddActivity.class);
+    expenseIntent.putExtra("type", "expense");
+    android.app.PendingIntent expensePendingIntent = android.app.PendingIntent.getActivity(
+        context,
+        1,
+        expenseIntent,
+        android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+    views.setOnClickPendingIntent(R.id.btn_add_expense, expensePendingIntent);
+
+    // PendingIntent for Add Income
+    Intent incomeIntent = new Intent(context, QuickAddActivity.class);
+    incomeIntent.putExtra("type", "income");
+    android.app.PendingIntent incomePendingIntent = android.app.PendingIntent.getActivity(
+        context,
+        2,
+        incomeIntent,
+        android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE);
+    views.setOnClickPendingIntent(R.id.btn_add_income, incomePendingIntent);
 
     // Instruct the widget manager to update the widget
     appWidgetManager.updateAppWidget(appWidgetId, views);

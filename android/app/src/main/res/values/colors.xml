@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#D4FF33</color>
+    <color name="colorPrimaryDark">#AACC29</color>
+    <color name="colorAccent">#6B5B95</color>
+    
+    <color name="colorBackgroundDark">#121212</color>
+    <color name="colorCardDark">#1E1E1E</color>
+    <color name="colorCardLighter">#2C2C2C</color>
+    
+    <color name="colorExpense">#FF5252</color>
+    <color name="colorIncome">#33D499</color>
+    <color name="colorTextWhite">#FFFFFF</color>
+    <color name="colorTextGray">#AAAAAA</color>
+</resources>

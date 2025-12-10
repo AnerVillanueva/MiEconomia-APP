@@ -1,0 +1,207 @@
+package com.mieconomia.app;
+
+import android.appwidget.AppWidgetManager;
+import android.appwidget.AppWidgetProvider;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
+import android.widget.RemoteViews;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+public class RadarWidget extends AppWidgetProvider {
+
+  static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
+      int appWidgetId) {
+
+    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.radar_widget);
+
+    // Calculate chart
+    Bitmap chartBitmap = createRadarChartBitmap(context);
+    views.setImageViewBitmap(R.id.img_radar_chart, chartBitmap);
+
+    appWidgetManager.updateAppWidget(appWidgetId, views);
+  }
+
+  private static Bitmap createRadarChartBitmap(Context context) {
+    int width = 400;
+    int height = 400;
+    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+
+    // Config
+    float centerX = width / 2f;
+    float centerY = height / 2f;
+    float radius = Math.min(centerX, centerY) * 0.7f;
+
+    // Colors
+    int colorExpense = Color.parseColor("#FF5252");
+    int colorIncome = Color.parseColor("#33D499");
+    int colorGrid = Color.parseColor("#33FFFFFF");
+    int colorText = Color.parseColor("#80FFFFFF");
+
+    Paint paint = new Paint();
+    paint.setAntiAlias(true);
+
+    // Read Data
+    SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+    String expenseJson = prefs.getString("widget_expense_categories", "{}");
+    String incomeJson = prefs.getString("widget_income_categories", "{}");
+
+    Map<String, Double> expenses = parseCategories(expenseJson);
+    Map<String, Double> income = parseCategories(incomeJson);
+
+    // Hardcoded list of all possible categories to ensure fixed axes
+    List<String> allCategories = new ArrayList<>();
+    allCategories.add("Comida");
+    allCategories.add("Transp");
+    allCategories.add("Casa");
+    allCategories.add("Ocio");
+    allCategories.add("Salud");
+    allCategories.add("Ropa");
+    allCategories.add("Otros");
+    allCategories.add("Nómina");
+    allCategories.add("Regalo");
+    allCategories.add("Venta");
+
+    double maxValue = 100; // Default minimum max
+    for (Double val : expenses.values())
+      maxValue = Math.max(maxValue, val);
+    for (Double val : income.values())
+      maxValue = Math.max(maxValue, val);
+
+    // Draw Grid
+    int sides = allCategories.size();
+    float angleStep = (float) (2 * Math.PI / sides);
+
+    // Draw concentric webs
+    paint.setStyle(Paint.Style.STROKE);
+    paint.setColor(colorGrid);
+    paint.setStrokeWidth(2f);
+
+    for (int i = 1; i <= 4; i++) {
+      float r = radius * (i / 4f);
+      Path gridPath = new Path();
+      for (int j = 0; j < sides; j++) {
+        float angle = j * angleStep - (float) Math.PI / 2;
+        float x = centerX + (float) Math.cos(angle) * r;
+        float y = centerY + (float) Math.sin(angle) * r;
+        if (j == 0)
+          gridPath.moveTo(x, y);
+        else
+          gridPath.lineTo(x, y);
+      }
+      gridPath.close();
+      canvas.drawPath(gridPath, paint);
+    }
+
+    // Draw Axes & Labels
+    paint.setTextSize(24f);
+    paint.setTextAlign(Paint.Align.CENTER);
+
+    for (int j = 0; j < sides; j++) {
+      float angle = j * angleStep - (float) Math.PI / 2;
+      float x = centerX + (float) Math.cos(angle) * radius;
+      float y = centerY + (float) Math.sin(angle) * radius;
+      canvas.drawLine(centerX, centerY, x, y, paint);
+
+      // Labels
+      float labelRadius = radius * 1.2f;
+      float lx = centerX + (float) Math.cos(angle) * labelRadius;
+      float ly = centerY + (float) Math.sin(angle) * labelRadius;
+
+      paint.setColor(colorText);
+      paint.setStyle(Paint.Style.FILL);
+      canvas.drawText(allCategories.get(j).substring(0, Math.min(6, allCategories.get(j).length())), lx, ly + 8, paint);
+
+      // Restore paint for grid lines
+      paint.setStyle(Paint.Style.STROKE);
+      paint.setColor(colorGrid);
+    }
+
+    // Draw Expense Data
+    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, expenses, maxValue, colorExpense, 80);
+
+    // Draw Income Data
+    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, income, maxValue, colorIncome, 80);
+
+    return bitmap;
+  }
+
+  private static void drawPoly(Canvas canvas, float cx, float cy, float radius, int sides, float angleStep,
+      List<String> categories, Map<String, Double> data, double maxValue, int color, int alpha) {
+    Path path = new Path();
+    Paint paint = new Paint();
+    paint.setAntiAlias(true);
+
+    for (int j = 0; j < sides; j++) {
+      String cat = categories.get(j);
+      double val = data.containsKey(cat) ? data.get(cat) : 0;
+      float r = (float) ((val / maxValue) * radius);
+      // Min radius for visibility
+      if (val > 0 && r < 10)
+        r = 10;
+
+      float angle = j * angleStep - (float) Math.PI / 2;
+      float x = cx + (float) Math.cos(angle) * r;
+      float y = cy + (float) Math.sin(angle) * r;
+
+      if (j == 0)
+        path.moveTo(x, y);
+      else
+        path.lineTo(x, y);
+    }
+    path.close();
+
+    // Fill
+    paint.setStyle(Paint.Style.FILL);
+    paint.setColor(color);
+    paint.setAlpha(alpha); // Transparency
+    canvas.drawPath(path, paint);
+
+    // Stroke
+    paint.setStyle(Paint.Style.STROKE);
+    paint.setColor(color);
+    paint.setStrokeWidth(4f);
+    paint.setAlpha(255);
+    canvas.drawPath(path, paint);
+  }
+
+  private static Map<String, Double> parseCategories(String jsonStr) {
+    Map<String, Double> map = new HashMap<>();
+    try {
+      // Remove quotes if double encoded
+      if (jsonStr.startsWith("\"") && jsonStr.endsWith("\"")) {
+        jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+        jsonStr = jsonStr.replace("\\\"", "\"");
+      }
+
+      JSONObject json = new JSONObject(jsonStr);
+      Iterator<String> keys = json.keys();
+      while (keys.hasNext()) {
+        String key = keys.next();
+        map.put(key, json.getDouble(key));
+      }
+    } catch (Exception e) {
+      // e.printStackTrace();
+    }
+    return map;
+  }
+
+  @Override
+  public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+    for (int appWidgetId : appWidgetIds) {
+      updateAppWidget(context, appWidgetManager, appWidgetId);
+    }
+  }
+}

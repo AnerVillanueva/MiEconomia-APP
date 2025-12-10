@@ -61,7 +61,7 @@
                 android:resource="@xml/balance_widget_info" />
         </receiver>
 
-        <receiver android:name=".QuickAddWidget"
+        <receiver android:name=".ExpenseWidget"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -69,8 +69,30 @@
 
             <meta-data
                 android:name="android.appwidget.provider"
-                android:resource="@xml/quick_add_widget_info" />
+                android:resource="@xml/expense_widget_info" />
         </receiver>
+
+        <receiver android:name=".IncomeWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/income_widget_info" />
+        </receiver>
+        <receiver android:name=".RadarWidget"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/radar_widget_info" />
+        </receiver>
+
     </application>
 
     <!-- Permissions -->

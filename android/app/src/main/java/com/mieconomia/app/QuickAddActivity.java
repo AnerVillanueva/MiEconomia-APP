@@ -48,11 +48,17 @@ public class QuickAddActivity extends AppCompatActivity {
     etDescription = findViewById(R.id.et_description);
     Button btnSave = findViewById(R.id.btn_save);
 
-    // Set Title
+    // Set Title and Colors
     if ("income".equals(type)) {
       tvTitle.setText("Añadir Ingreso");
+      tvTitle.setTextColor(getResources().getColor(R.color.colorIncome));
+      btnSave.setBackgroundResource(R.drawable.button_background);
+      btnSave.getBackground().setTint(getResources().getColor(R.color.colorIncome));
     } else {
       tvTitle.setText("Añadir Gasto");
+      tvTitle.setTextColor(getResources().getColor(R.color.colorExpense));
+      btnSave.setBackgroundResource(R.drawable.button_background);
+      btnSave.getBackground().setTint(getResources().getColor(R.color.colorExpense));
     }
 
     // Setup Spinner
@@ -62,7 +68,28 @@ public class QuickAddActivity extends AppCompatActivity {
     } else {
       categories = new String[] { "Comida", "Transporte", "Casa", "Ocio", "Salud", "Ropa", "Otros" };
     }
-    ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_dropdown_item, categories);
+
+    // Use a custom layout for spinner items if possible, or default but with white
+    // text theme
+    // For now stick to simple_spinner_dropdown_item but we might need a custom one
+    // for text color
+    ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item,
+        categories) {
+      @Override
+      public View getView(int position, View convertView, android.view.ViewGroup parent) {
+        TextView view = (TextView) super.getView(position, convertView, parent);
+        view.setTextColor(getResources().getColor(R.color.colorTextWhite));
+        return view;
+      }
+
+      @Override
+      public View getDropDownView(int position, View convertView, android.view.ViewGroup parent) {
+        TextView view = (TextView) super.getDropDownView(position, convertView, parent);
+        view.setBackgroundColor(getResources().getColor(R.color.colorCardDark));
+        view.setTextColor(getResources().getColor(R.color.colorTextWhite));
+        return view;
+      }
+    };
     spinnerCategory.setAdapter(adapter);
 
     btnSave.setOnClickListener(new View.OnClickListener() {

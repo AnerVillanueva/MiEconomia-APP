@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Widget Preview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --bg-dark: #121212;
+            --glass-bg: rgba(30, 30, 30, 0.85);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --primary-lime: #D4FF33;
+            --secondary-purple: #6B5B95;
+            --purple-gradient: linear-gradient(135deg, rgba(107, 91, 149, 0.95) 0%, rgba(88, 86, 214, 0.9) 100%);
+            --text-white: #FFFFFF;
+            --text-gray: #AAAAAA;
+            --expense-red: #FF5252;
+            --income-green: #33D499;
+            --font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: #000;
+            background-image: url('https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=2564&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            color: var(--text-white);
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .preview-container {
+            display: flex;
+            flex-direction: column;
+            gap: 60px;
+            /* More spacing */
+            align-items: center;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .section-title {
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        /* --- Radar Widget --- */
+        .widget-radar {
+            width: 320px;
+            height: 320px;
+            border-radius: 24px;
+            background: #121212;
+            /* Widget Background */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .radar-grid {
+            position: absolute;
+            width: 220px;
+            /* Slightly larger grid */
+            height: 220px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-grid::before {
+            content: '';
+            position: absolute;
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .radar-grid::after {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+        }
+
+        .radar-axis {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.1);
+            top: 50%;
+            left: 0;
+            transform-origin: center;
+        }
+
+        /* Labels styled to look like Android text */
+        .radar-label {
+            position: absolute;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.7);
+            text-transform: uppercase;
+            font-weight: 500;
+        }
+
+        /* --- 2x2 Widget --- */
+        .widget-2x2 {
+            width: 320px;
+            height: 170px;
+            border-radius: 24px;
+            background: var(--purple-gradient);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            padding: 16px;
+            justify-content: space-between;
+            color: white;
+        }
+
+        .widget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .widget-balance {
+            font-size: 28px;
+            font-weight: 800;
+            margin-bottom: 12px;
+        }
+
+        .widget-stats {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .widget-stat-pill {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+        }
+
+        .dot.green {
+            background-color: var(--income-green);
+        }
+
+        .dot.red {
+            background-color: var(--expense-red);
+        }
+
+        .widget-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .widget-btn {
+            flex: 1;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-income {
+            background: rgba(51, 212, 153, 0.25);
+            color: var(--income-green);
+            border: 1px solid rgba(51, 212, 153, 0.3);
+        }
+
+        .btn-expense {
+            background: rgba(255, 82, 82, 0.25);
+            color: var(--expense-red);
+            border: 1px solid rgba(255, 82, 82, 0.3);
+        }
+
+        /* --- 1x1 Widgets --- */
+        .widgets-1x1-row {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+        }
+
+        .widget-1x1 {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            background: #1E1E1E;
+            /* Dark Card Bg */
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .widget-1x1.expense {
+            border: 2px solid var(--expense-red);
+            color: var(--expense-red);
+        }
+
+        .widget-1x1.income {
+            border: 2px solid var(--income-green);
+            color: var(--income-green);
+        }
+
+        /* --- Popup --- */
+        .popup-preview {
+            width: 320px;
+            background: #1E1E1E;
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--glass-border);
+        }
+
+        .popup-title {
+            color: var(--expense-red);
+            font-size: 18px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            text-align: center;
+        }
+
+        .custom-input,
+        .custom-select {
+            width: 100%;
+            background: rgba(44, 44, 44, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 14px;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            /* Fix padding issues */
+            font-family: inherit;
+        }
+
+        .popup-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 12px;
+            border: none;
+            background: var(--expense-red);
+            color: white;
+            font-weight: 700;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="preview-container">
+
+        <!-- Radar Widget -->
+        <div>
+            <div class="section-title">1. Grafico Radar (4x4)</div>
+            <div class="widget-radar">
+                <div class="radar-grid">
+                    <!-- 5 Axes for 10 categories -->
+                    <div class="radar-axis" style="transform: rotate(0deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(36deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(72deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(108deg);"></div>
+                    <div class="radar-axis" style="transform: rotate(144deg);"></div>
+                </div>
+
+                <!-- Labels roughly positioned around -->
+                <span class="radar-label" style="top: 15px; left: 50%; transform: translateX(-50%);">Comida</span>
+                <span class="radar-label" style="top: 45px; right: 45px;">Transp</span>
+                <span class="radar-label" style="top: 110px; right: 10px;">Casa</span>
+                <span class="radar-label" style="bottom: 100px; right: 10px;">Ocio</span>
+                <span class="radar-label" style="bottom: 35px; right: 50px;">Salud</span>
+                <span class="radar-label" style="bottom: 10px; left: 50%; transform: translateX(-50%);">Ropa</span>
+                <span class="radar-label" style="bottom: 35px; left: 50px;">Otros</span>
+                <span class="radar-label" style="bottom: 100px; left: 10px;">Nómina</span>
+                <span class="radar-label" style="top: 110px; left: 10px;">Regalo</span>
+                <span class="radar-label" style="top: 45px; left: 45px;">Venta</span>
+
+
+                <svg width="320" height="320" style="position:absolute; top:0; left:0;">
+                    <!-- Expense Polygon -->
+                    <polygon points="160,80 200,100 220,160 200,200 160,220 120,200 100,160 120,100 140,80"
+                        fill="rgba(255, 82, 82, 0.2)" stroke="#FF5252" stroke-width="2" />
+                    <!-- Income Polygon -->
+                    <polygon points="160,160 160,160 160,160 160,160 160,160 160,160 160,160 130,220 100,150 120,60"
+                        fill="rgba(51, 212, 153, 0.2)" stroke="#33D499" stroke-width="2" />
+                </svg>
+            </div>
+        </div>
+
+        <!-- 2x2 Widget -->
+        <div>
+            <div class="section-title">2. Balance Interactivo (2x2)</div>
+            <div class="widget-2x2">
+                <div>
+                    <div class="widget-header">
+                        <span style="opacity:0.7; font-size:10px; font-weight:bold; text-transform:uppercase;">Balance
+                            Total</span>
+                        <span style="opacity:0.5; font-size:10px;">MiEconomía</span>
+                    </div>
+                    <div class="widget-balance">2.450,50 €</div>
+                    <div class="widget-stats">
+                        <div class="widget-stat-pill">
+                            <span class="dot green"></span> +1.200 €
+                        </div>
+                        <div class="widget-stat-pill">
+                            <span class="dot red"></span> -450 €
+                        </div>
+                    </div>
+                </div>
+                <div class="widget-actions">
+                    <button class="widget-btn btn-expense">- Gasto</button>
+                    <button class="widget-btn btn-income">+ Ingreso</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 1x1 Widgets -->
+        <div>
+            <div class="section-title">3. Accesos Rápidos (1x1)</div>
+            <div class="widgets-1x1-row">
+                <div class="widget-1x1 expense">
+                    <span>-</span>
+                </div>
+                <div class="widget-1x1 income">
+                    <span>+</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup -->
+        <div>
+            <div class="section-title">4. Ventana Emergente</div>
+            <div class="popup-preview">
+                <div class="popup-title">Añadir Gasto</div>
+                <div style="font-size: 12px; color: #888; text-align:center; margin-bottom:20px;">Introduce los detalles
+                </div>
+
+                <input type="text" class="custom-input" placeholder="0.00 €"
+                    style="font-size: 24px; font-weight: bold; text-align: center;">
+
+                <select class="custom-select">
+                    <option>Comida</option>
+                    <option>Transporte</option>
+                    <option>Hogar</option>
+                </select>
+
+                <input type="text" class="custom-input" placeholder="Nota (Opcional)">
+
+                <button class="popup-btn">Guardar Movimiento</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
