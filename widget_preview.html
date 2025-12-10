@@ -297,106 +297,125 @@
 
         <!-- Radar Widget -->
         <div>
-            <div class="section-title">1. Grafico Radar (4x4)</div>
-            <div class="widget-radar">
-                <div class="radar-grid">
-                    <!-- 5 Axes for 10 categories -->
-                    <div class="radar-axis" style="transform: rotate(0deg);"></div>
-                    <div class="radar-axis" style="transform: rotate(36deg);"></div>
-                    <div class="radar-axis" style="transform: rotate(72deg);"></div>
-                    <div class="radar-axis" style="transform: rotate(108deg);"></div>
-                    <div class="radar-axis" style="transform: rotate(144deg);"></div>
-                </div>
-
-                <!-- Labels roughly positioned around -->
-                <!-- Labels roughly positioned around -->
-                <span class="radar-label" style="top: 15px; left: 50%; transform: translateX(-50%);">Nómina</span>
-                <span class="radar-label" style="top: 60px; right: 50px;">Comida</span>
-                <span class="radar-label" style="top: 110px; right: 10px;">Negocios</span>
-                <span class="radar-label" style="bottom: 80px; right: 20px;">Gasolina</span>
-                <span class="radar-label" style="bottom: 20px; left: 50%; transform: translateX(-50%);">Ropa</span>
-                <span class="radar-label" style="bottom: 80px; left: 20px;">Salud</span>
-                <span class="radar-label" style="top: 110px; left: 10px;">Otros</span>
-
-
-                <svg width="320" height="320" style="position:absolute; top:0; left:0;">
-                    <!-- Expense Polygon -->
-                    <polygon points="160,80 200,100 220,160 200,200 160,220 120,200 100,160 120,100 140,80"
-                        fill="rgba(255, 82, 82, 0.2)" stroke="#FF5252" stroke-width="2" />
-                    <!-- Income Polygon -->
-                    <polygon points="160,160 160,160 160,160 160,160 160,160 160,160 160,160 130,220 100,150 120,60"
-                        fill="rgba(51, 212, 153, 0.2)" stroke="#33D499" stroke-width="2" />
-                </svg>
-            </div>
-        </div>
-
-        <!-- 2x2 Widget -->
-        <div>
-            <div class="section-title">2. Balance Interactivo (2x2)</div>
-            <div class="widget-2x2">
-                <div>
-                    <div class="widget-header">
-                        <span style="opacity:0.7; font-size:10px; font-weight:bold; text-transform:uppercase;">Balance
-                            Total</span>
-                        <span style="opacity:0.5; font-size:10px;">MiEconomía</span>
+            <!-- Radar Widget -->
+            <div>
+                <div class="section-title">1. Grafico Radar (4x4)</div>
+                <div class="widget-radar">
+                    <div class="radar-grid">
+                        <!-- 5 Axes for 10 categories -->
+                        <div class="radar-axis" style="transform: rotate(0deg);"></div>
+                        <div class="radar-axis" style="transform: rotate(36deg);"></div>
+                        <div class="radar-axis" style="transform: rotate(72deg);"></div>
+                        <div class="radar-axis" style="transform: rotate(108deg);"></div>
+                        <div class="radar-axis" style="transform: rotate(144deg);"></div>
                     </div>
-                    <div class="widget-balance">2.450,50 €</div>
-                    <div class="widget-stats">
-                        <div class="widget-stat-pill">
-                            <span class="dot green"></span> +1.200 €
+
+                    <!-- Labels roughly positioned around -->
+                    <!-- Labels roughly positioned around -->
+                    <span class="radar-label"
+                        style="top: 15px; left: 50%; transform: translateX(-50%); font-size: 16px;">💰</span>
+                    <span class="radar-label" style="top: 60px; right: 50px; font-size: 16px;">🍔</span>
+                    <span class="radar-label" style="top: 110px; right: 10px; font-size: 16px;">💼</span>
+                    <span class="radar-label" style="bottom: 80px; right: 20px; font-size: 16px;">⛽</span>
+                    <span class="radar-label"
+                        style="bottom: 20px; left: 50%; transform: translateX(-50%); font-size: 16px;">👕</span>
+                    <span class="radar-label" style="bottom: 80px; left: 20px; font-size: 16px;">⚕️</span>
+                    <span class="radar-label" style="top: 110px; left: 10px; font-size: 16px;">ℹ️</span>
+
+
+                    <svg width="320" height="320" style="position:absolute; top:0; left:0;">
+                        <!-- Expense Polygon -->
+                        <polygon points="160,80 200,100 220,160 200,200 160,220 120,200 100,160 120,100 140,80"
+                            fill="rgba(255, 82, 82, 0.2)" stroke="#FF5252" stroke-width="2" />
+                        <!-- Income Polygon -->
+                        <polygon points="160,160 160,160 160,160 160,160 160,160 160,160 160,160 130,220 100,150 120,60"
+                            fill="rgba(51, 212, 153, 0.2)" stroke="#33D499" stroke-width="2" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- 2x2 Widget -->
+            <div>
+                <div class="section-title">2. Balance Visual (2x2)</div>
+                <div class="widget-2x2"
+                    style="flex-direction: row; justify-content: flex-start; align-items: center; gap: 10px;">
+                    <div style="flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px;">
+                        <div class="widget-header" style="justify-content: flex-start; gap: 8px;">
+                            <span
+                                style="opacity:0.7; font-size:10px; font-weight:bold; text-transform:uppercase;">Balance</span>
+                            <span style="opacity:0.5; font-size:10px;">MiEconomía</span>
                         </div>
-                        <div class="widget-stat-pill">
-                            <span class="dot red"></span> -450 €
+                        <div class="widget-balance" style="font-size: 22px;">2.450,50 €</div>
+                        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 8px;">
+                            <div class="widget-stat-pill" style="align-self: flex-start; padding: 2px 6px;">
+                                <span class="dot green"></span> +1.200 €
+                            </div>
+                            <div class="widget-stat-pill" style="align-self: flex-start; padding: 2px 6px;">
+                                <span class="dot red"></span> -450 €
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="widget-actions">
-                    <button class="widget-btn btn-expense">- Gasto</button>
-                    <button class="widget-btn btn-income">+ Ingreso</button>
+                    <!-- Mini Radar -->
+                    <div
+                        style="width: 120px; height: 120px; position: relative; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.1); flex-shrink: 0; display:flex; align-items:center; justify-content:center;">
+                        <div
+                            style="position: absolute; width: 80px; height: 80px; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.1);">
+                        </div>
+                        <div
+                            style="position: absolute; width: 40px; height: 40px; border-radius: 50%; border: 1px dashed rgba(255,255,255,0.1);">
+                        </div>
+                        <!-- Simple polygon approximation -->
+                        <svg width="120" height="120" style="position:absolute;">
+                            <polygon points="60,30 80,50 70,80 50,80 40,50" fill="rgba(255, 82, 82, 0.4)"
+                                stroke="#FF5252" stroke-width="1.5" />
+                            <polygon points="60,60 70,50 60,60 50,70" fill="rgba(51, 212, 153, 0.4)" stroke="#33D499"
+                                stroke-width="1.5" />
+                        </svg>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- 1x1 Widgets -->
-        <div>
-            <div class="section-title">3. Accesos Rápidos (1x1)</div>
-            <div class="widgets-1x1-row">
-                <div class="widget-1x1 expense">
-                    <span>-</span>
-                </div>
-                <div class="widget-1x1 income">
-                    <span>+</span>
+            <!-- 1x1 Widgets -->
+            <div>
+                <div class="section-title">3. Accesos Rápidos (1x1)</div>
+                <div class="widgets-1x1-row">
+                    <div class="widget-1x1 expense">
+                        <span>-</span>
+                    </div>
+                    <div class="widget-1x1 income">
+                        <span>+</span>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Popup -->
-        <div>
-            <div class="section-title">4. Ventana Emergente</div>
-            <div class="popup-preview">
-                <div class="popup-title">Añadir Gasto</div>
-                <div style="font-size: 12px; color: #888; text-align:center; margin-bottom:20px;">Introduce los detalles
+            <!-- Popup -->
+            <div>
+                <div class="section-title">4. Ventana Emergente</div>
+                <div class="popup-preview">
+                    <div class="popup-title">Añadir Gasto</div>
+                    <div style="font-size: 12px; color: #888; text-align:center; margin-bottom:20px;">Introduce los
+                        detalles
+                    </div>
+
+                    <input type="text" class="custom-input" placeholder="0.00 €"
+                        style="font-size: 24px; font-weight: bold; text-align: center;">
+
+                    <select class="custom-select">
+                        <option>Comida</option>
+                        <option>Negocios</option>
+                        <option>Gasolina</option>
+                        <option>Ropa</option>
+                        <option>Salud</option>
+                        <option>Otros</option>
+                    </select>
+
+                    <input type="text" class="custom-input" placeholder="Nota (Opcional)">
+
+                    <button class="popup-btn">Guardar Movimiento</button>
                 </div>
-
-                <input type="text" class="custom-input" placeholder="0.00 €"
-                    style="font-size: 24px; font-weight: bold; text-align: center;">
-
-                <select class="custom-select">
-                    <option>Comida</option>
-                    <option>Negocios</option>
-                    <option>Gasolina</option>
-                    <option>Ropa</option>
-                    <option>Salud</option>
-                    <option>Otros</option>
-                </select>
-
-                <input type="text" class="custom-input" placeholder="Nota (Opcional)">
-
-                <button class="popup-btn">Guardar Movimiento</button>
             </div>
-        </div>
 
-    </div>
+        </div>
 
 </body>
 
