@@ -81,13 +81,16 @@ public class RadarWidget extends AppWidgetProvider {
     int sides = allCategories.size();
     float angleStep = (float) (2 * Math.PI / sides);
 
-    // Draw concentric webs
-    paint.setStyle(Paint.Style.STROKE);
-    paint.setColor(colorGrid);
-    paint.setStrokeWidth(2f);
+    // Grid Paint (Dashed)
+    Paint paintGrid = new Paint();
+    paintGrid.setStyle(Paint.Style.STROKE);
+    paintGrid.setColor(colorGrid);
+    paintGrid.setStrokeWidth(2f);
+    paintGrid.setPathEffect(new android.graphics.DashPathEffect(new float[] { 10f, 10f }, 0f));
+    paintGrid.setAntiAlias(true);
 
-    for (int i = 1; i <= 4; i++) {
-      float r = radius * (i / 4f);
+    for (int i = 1; i <= 3; i++) {
+      float r = radius * (i / 3f);
       Path gridPath = new Path();
       for (int j = 0; j < sides; j++) {
         float angle = j * angleStep - (float) Math.PI / 2;
@@ -99,31 +102,34 @@ public class RadarWidget extends AppWidgetProvider {
           gridPath.lineTo(x, y);
       }
       gridPath.close();
-      canvas.drawPath(gridPath, paint);
+      canvas.drawPath(gridPath, paintGrid);
     }
 
-    // Draw Axes & Labels
-    paint.setTextAlign(Paint.Align.CENTER);
+    // Axes & Labels (Emojis)
+    Paint paintEmoji = new Paint();
+    paintEmoji.setTextSize(40f);
+    paintEmoji.setTextAlign(Paint.Align.CENTER);
+    paintEmoji.setAntiAlias(true);
 
     for (int j = 0; j < sides; j++) {
       float angle = j * angleStep - (float) Math.PI / 2;
       float x = centerX + (float) Math.cos(angle) * radius;
       float y = centerY + (float) Math.sin(angle) * radius;
-      canvas.drawLine(centerX, centerY, x, y, paint);
 
-      // Labels (Icons)
-      float labelRadius = radius * 1.15f;
+      // Draw axis line (solid or dashed? keeping solid for axis looks better, or
+      // dashed if user strictly wants dashed lines. Let's make internal grid dashed,
+      // axes solid or light)
+      // User said "lineas discontinuas", usually refers to the grid.
+      canvas.drawLine(centerX, centerY, x, y, paintGrid);
+
+      // Labels (Emojis)
+      float labelRadius = radius * 1.25f;
       float lx = centerX + (float) Math.cos(angle) * labelRadius;
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
-      Bitmap icon = getIconForCategory(context, allCategories.get(j));
-      if (icon != null) {
-        canvas.drawBitmap(icon, lx - icon.getWidth() / 2f, ly - icon.getHeight() / 2f, null);
-      }
-
-      // Restore paint for grid lines
-      paint.setStyle(Paint.Style.STROKE);
-      paint.setColor(colorGrid);
+      String emoji = getEmojiForCategory(allCategories.get(j));
+      // Adjust ly slightly for vertical centering of text
+      canvas.drawText(emoji, lx, ly + 14, paintEmoji);
     }
 
     // Draw Expense Data
@@ -202,45 +208,24 @@ public class RadarWidget extends AppWidgetProvider {
     }
   }
 
-  private static Bitmap getIconForCategory(Context context, String category) {
-    int resId;
+  private static String getEmojiForCategory(String category) {
     switch (category) {
       case "Nómina":
-        resId = R.drawable.ic_cat_nomina;
-        break;
+        return "💰";
       case "Comida":
-        resId = R.drawable.ic_cat_comida;
-        break;
+        return "🍔";
       case "Negocios":
-        resId = R.drawable.ic_cat_negocios;
-        break;
+        return "💼";
       case "Gasolina":
-        resId = R.drawable.ic_cat_gasolina;
-        break;
+        return "⛽";
       case "Ropa":
-        resId = R.drawable.ic_cat_ropa;
-        break;
+        return "👕";
       case "Salud":
-        resId = R.drawable.ic_cat_salud;
-        break;
+        return "⚕️";
+      case "Otros":
+        return "ℹ️";
       default:
-        resId = R.drawable.ic_cat_otros;
-        break;
-    }
-    try {
-      android.graphics.drawable.Drawable drawable = context.getDrawable(resId);
-      if (drawable == null)
-        return null;
-
-      int size = 48; // px
-      Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
-      Canvas canvas = new Canvas(bitmap);
-      drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
-      drawable.setTint(Color.parseColor("#B3FFFFFF")); // Light white tint
-      drawable.draw(canvas);
-      return bitmap;
-    } catch (Exception e) {
-      return null;
+        return "•";
     }
   }
 }
