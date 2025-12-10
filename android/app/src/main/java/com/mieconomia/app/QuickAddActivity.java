@@ -64,9 +64,9 @@ public class QuickAddActivity extends AppCompatActivity {
     // Setup Spinner
     String[] categories;
     if ("income".equals(type)) {
-      categories = new String[] { "Nómina", "Regalo", "Venta", "Otros" };
+      categories = new String[] { "Nómina", "Negocios", "Otros" };
     } else {
-      categories = new String[] { "Comida", "Transporte", "Casa", "Ocio", "Salud", "Ropa", "Otros" };
+      categories = new String[] { "Comida", "Negocios", "Gasolina", "Ropa", "Salud", "Otros" };
     }
 
     // Use a custom layout for spinner items if possible, or default but with white

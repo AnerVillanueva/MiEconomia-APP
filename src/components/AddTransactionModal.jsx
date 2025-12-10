@@ -57,14 +57,13 @@ const AddTransactionModal = ({ isOpen, onClose, onAdd, type }) => {
               style={styles.select}
             >
               <option value="">Seleccionar...</option>
-              <option value="COMIDA">Comida</option>
-              <option value="JUEGOS">Juegos</option>
-              <option value="NEGOCIOS">Negocios</option>
-              <option value="NOMINA">Nómina</option>
-              <option value="GASOLINA">Gasolina</option>
-              <option value="ROPA">Ropa</option>
-              <option value="SALUD">Salud</option>
-              <option value="OTROS">Otros</option>
+              <option value="Nómina">Nómina</option>
+              <option value="Comida">Comida</option>
+              <option value="Negocios">Negocios</option>
+              <option value="Gasolina">Gasolina</option>
+              <option value="Ropa">Ropa</option>
+              <option value="Salud">Salud</option>
+              <option value="Otros">Otros</option>
             </select>
           </div>
 

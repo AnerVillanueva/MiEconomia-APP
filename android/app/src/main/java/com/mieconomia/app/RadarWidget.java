@@ -63,16 +63,13 @@ public class RadarWidget extends AppWidgetProvider {
 
     // Hardcoded list of all possible categories to ensure fixed axes
     List<String> allCategories = new ArrayList<>();
-    allCategories.add("Comida");
-    allCategories.add("Transp");
-    allCategories.add("Casa");
-    allCategories.add("Ocio");
-    allCategories.add("Salud");
-    allCategories.add("Ropa");
-    allCategories.add("Otros");
     allCategories.add("Nómina");
-    allCategories.add("Regalo");
-    allCategories.add("Venta");
+    allCategories.add("Comida");
+    allCategories.add("Negocios");
+    allCategories.add("Gasolina");
+    allCategories.add("Ropa");
+    allCategories.add("Salud");
+    allCategories.add("Otros");
 
     double maxValue = 100; // Default minimum max
     for (Double val : expenses.values())

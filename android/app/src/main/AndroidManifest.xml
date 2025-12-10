@@ -34,7 +34,7 @@
         <activity
             android:name=".QuickAddActivity"
             android:label="Añadir Rápido"
-            android:theme="@style/Theme.AppCompat.Light.Dialog"
+            android:theme="@style/Theme.QuickAdd"
             android:excludeFromRecents="true"
             android:taskAffinity=""
             android:launchMode="singleInstance">

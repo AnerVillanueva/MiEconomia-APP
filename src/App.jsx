@@ -232,10 +232,29 @@ function App() {
         const incomeCategories = {};
 
         currentMonthTransactions.forEach(t => {
+          let cat = t.category;
+          // Normalize to Title Case to match Widget and merge old data
+          if (cat === 'NOMINA') cat = 'Nómina';
+          else if (cat === 'COMIDA') cat = 'Comida';
+          else if (cat === 'NEGOCIOS') cat = 'Negocios';
+          else if (cat === 'GASOLINA') cat = 'Gasolina';
+          else if (cat === 'ROPA') cat = 'Ropa';
+          else if (cat === 'SALUD') cat = 'Salud';
+          else if (cat === 'OTROS') cat = 'Otros';
+          else {
+            // Fallback for others or already correct ones
+            if (cat && cat.length > 0) {
+              // Only capitalize first letter if it looks like it needs it (simple heuristic)
+              if (cat === cat.toUpperCase() && cat.length > 1) {
+                cat = cat.charAt(0).toUpperCase() + cat.slice(1).toLowerCase();
+              }
+            }
+          }
+
           if (t.type === 'expense') {
-            expenseCategories[t.category] = (expenseCategories[t.category] || 0) + t.amount;
+            expenseCategories[cat] = (expenseCategories[cat] || 0) + t.amount;
           } else {
-            incomeCategories[t.category] = (incomeCategories[t.category] || 0) + t.amount;
+            incomeCategories[cat] = (incomeCategories[cat] || 0) + t.amount;
           }
         });
 
