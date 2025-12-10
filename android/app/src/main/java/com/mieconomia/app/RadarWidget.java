@@ -103,7 +103,6 @@ public class RadarWidget extends AppWidgetProvider {
     }
 
     // Draw Axes & Labels
-    paint.setTextSize(24f);
     paint.setTextAlign(Paint.Align.CENTER);
 
     for (int j = 0; j < sides; j++) {
@@ -112,14 +111,15 @@ public class RadarWidget extends AppWidgetProvider {
       float y = centerY + (float) Math.sin(angle) * radius;
       canvas.drawLine(centerX, centerY, x, y, paint);
 
-      // Labels
-      float labelRadius = radius * 1.2f;
+      // Labels (Icons)
+      float labelRadius = radius * 1.15f;
       float lx = centerX + (float) Math.cos(angle) * labelRadius;
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
-      paint.setColor(colorText);
-      paint.setStyle(Paint.Style.FILL);
-      canvas.drawText(allCategories.get(j).substring(0, Math.min(6, allCategories.get(j).length())), lx, ly + 8, paint);
+      Bitmap icon = getIconForCategory(context, allCategories.get(j));
+      if (icon != null) {
+        canvas.drawBitmap(icon, lx - icon.getWidth() / 2f, ly - icon.getHeight() / 2f, null);
+      }
 
       // Restore paint for grid lines
       paint.setStyle(Paint.Style.STROKE);
@@ -199,6 +199,48 @@ public class RadarWidget extends AppWidgetProvider {
   public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
     for (int appWidgetId : appWidgetIds) {
       updateAppWidget(context, appWidgetManager, appWidgetId);
+    }
+  }
+
+  private static Bitmap getIconForCategory(Context context, String category) {
+    int resId;
+    switch (category) {
+      case "Nómina":
+        resId = R.drawable.ic_cat_nomina;
+        break;
+      case "Comida":
+        resId = R.drawable.ic_cat_comida;
+        break;
+      case "Negocios":
+        resId = R.drawable.ic_cat_negocios;
+        break;
+      case "Gasolina":
+        resId = R.drawable.ic_cat_gasolina;
+        break;
+      case "Ropa":
+        resId = R.drawable.ic_cat_ropa;
+        break;
+      case "Salud":
+        resId = R.drawable.ic_cat_salud;
+        break;
+      default:
+        resId = R.drawable.ic_cat_otros;
+        break;
+    }
+    try {
+      android.graphics.drawable.Drawable drawable = context.getDrawable(resId);
+      if (drawable == null)
+        return null;
+
+      int size = 48; // px
+      Bitmap bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888);
+      Canvas canvas = new Canvas(bitmap);
+      drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+      drawable.setTint(Color.parseColor("#B3FFFFFF")); // Light white tint
+      drawable.draw(canvas);
+      return bitmap;
+    } catch (Exception e) {
+      return null;
     }
   }
 }
