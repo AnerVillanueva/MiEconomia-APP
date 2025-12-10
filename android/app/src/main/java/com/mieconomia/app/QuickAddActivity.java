@@ -63,7 +63,7 @@ public class QuickAddActivity extends AppCompatActivity {
 
     // Setup Spinner
     // Use all categories for both types
-    categories = new String[] { "Nómina", "Comida", "Negocios", "Gasolina", "Ropa", "Salud", "Otros" };
+    String[] categories = new String[] { "Nómina", "Comida", "Negocios", "Gasolina", "Ropa", "Salud", "Otros" };
 
     // Use a custom layout for spinner items if possible, or default but with white
     // text theme
