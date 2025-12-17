@@ -51,7 +51,8 @@
         </provider>
 
         <receiver android:name=".BalanceWidget"
-            android:exported="true">
+            android:exported="true"
+            android:label="Balance Total">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -62,7 +63,8 @@
         </receiver>
 
         <receiver android:name=".ExpenseWidget"
-            android:exported="true">
+            android:exported="true"
+            android:label="Añadir Gasto">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -73,7 +75,8 @@
         </receiver>
 
         <receiver android:name=".IncomeWidget"
-            android:exported="true">
+            android:exported="true"
+            android:label="Añadir Ingreso">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -83,7 +86,8 @@
                 android:resource="@xml/income_widget_info" />
         </receiver>
         <receiver android:name=".RadarWidget"
-            android:exported="true">
+            android:exported="true"
+            android:label="Radar Financiero">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
