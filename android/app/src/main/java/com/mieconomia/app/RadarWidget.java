@@ -69,8 +69,8 @@ public class RadarWidget extends AppWidgetProvider {
 
   private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
       Map<String, Double> income) {
-    int width = 280; // Optimized for balance between quality and performance
-    int height = 280;
+    int width = 240; // Safer resolution
+    int height = 240;
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
 
@@ -107,12 +107,13 @@ public class RadarWidget extends AppWidgetProvider {
     int sides = allCategories.size();
     float angleStep = (float) (2 * Math.PI / sides);
 
-    // Grid Paint (Dashed)
+    // Grid Paint (Solid to verify stability)
     Paint paintGrid = new Paint();
     paintGrid.setStyle(Paint.Style.STROKE);
     paintGrid.setColor(colorGrid);
     paintGrid.setStrokeWidth(2f);
-    paintGrid.setPathEffect(new android.graphics.DashPathEffect(new float[] { 10f, 10f }, 0f));
+    // paintGrid.setPathEffect(new android.graphics.DashPathEffect(new float[] {
+    // 10f, 10f }, 0f));
     paintGrid.setAntiAlias(true);
 
     for (int i = 1; i <= 3; i++) {
