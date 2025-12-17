@@ -127,11 +127,65 @@ public class QuickAddActivity extends AppCompatActivity {
 
       saveToJsonFile(transaction);
 
+      // Update Widget Data Immediately
+      updateWidgetData(type, category, amount);
+
       Toast.makeText(this, "Guardado", Toast.LENGTH_SHORT).show();
       finish();
     } catch (JSONException e) {
       e.printStackTrace();
       Toast.makeText(this, "Error al crear transacción", Toast.LENGTH_SHORT).show();
+    }
+  }
+
+  private void updateWidgetData(String type, String category, double amount) {
+    // Determine key
+    String key = "widget_" + type + "_categories"; // "widget_expense_categories" or "widget_income_categories"
+
+    // Read SharedPrefs
+    android.content.SharedPreferences prefs = getSharedPreferences("CapacitorStorage", MODE_PRIVATE);
+    String jsonStr = prefs.getString(key, "{}");
+
+    // Parse
+    JSONObject json;
+    try {
+      // Handle double encoded string if necessary (common in Capacitor)
+      if (jsonStr.startsWith("\"") && jsonStr.endsWith("\"")) {
+        jsonStr = jsonStr.substring(1, jsonStr.length() - 1);
+        jsonStr = jsonStr.replace("\\\"", "\"");
+      }
+      json = new JSONObject(jsonStr);
+    } catch (Exception e) {
+      json = new JSONObject();
+    }
+
+    // Update value
+    try {
+      double currentVal = json.optDouble(category, 0.0);
+      json.put(category, currentVal + amount);
+
+      // Save back
+      // Note: Capacitor often saves as stringified JSON inside a string
+      // We will save as simple JSON string for our native widget usage,
+      // assuming the app can handle it or we re-encode if strictly needed.
+      // For native widget compatibility, simple string is best.
+      prefs.edit().putString(key, json.toString()).apply();
+
+      // Trigger Widget Update
+      android.content.Intent intent = new android.content.Intent(this, RadarWidget.class);
+      intent.setAction(android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+      int[] ids = android.appwidget.AppWidgetManager.getInstance(getApplication()).getAppWidgetIds(
+          new android.content.ComponentName(getApplication(), RadarWidget.class));
+      intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, ids);
+      sendBroadcast(intent);
+
+      // Also update the Balance Widget
+      // (Assuming Balance Widget listens to same or we update balance total manually
+      // if needed)
+      // For now, focusing on Radar Widget.
+
+    } catch (JSONException e) {
+      e.printStackTrace();
     }
   }
 

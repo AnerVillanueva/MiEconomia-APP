@@ -3,12 +3,15 @@ package com.mieconomia.app;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ComponentName;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.drawable.Drawable;
 import android.widget.RemoteViews;
 
 import org.json.JSONObject;
@@ -18,6 +21,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Locale;
 
 public class RadarWidget extends AppWidgetProvider {
 
@@ -25,33 +29,6 @@ public class RadarWidget extends AppWidgetProvider {
       int appWidgetId) {
 
     RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.radar_widget);
-
-    // Calculate chart
-    Bitmap chartBitmap = createRadarChartBitmap(context);
-    views.setImageViewBitmap(R.id.img_radar_chart, chartBitmap);
-
-    appWidgetManager.updateAppWidget(appWidgetId, views);
-  }
-
-  private static Bitmap createRadarChartBitmap(Context context) {
-    int width = 400;
-    int height = 400;
-    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-    Canvas canvas = new Canvas(bitmap);
-
-    // Config
-    float centerX = width / 2f;
-    float centerY = height / 2f;
-    float radius = Math.min(centerX, centerY) * 0.7f;
-
-    // Colors
-    int colorExpense = Color.parseColor("#FF5252");
-    int colorIncome = Color.parseColor("#33D499");
-    int colorGrid = Color.parseColor("#33FFFFFF");
-    int colorText = Color.parseColor("#80FFFFFF");
-
-    Paint paint = new Paint();
-    paint.setAntiAlias(true);
 
     // Read Data
     SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
@@ -61,7 +38,50 @@ public class RadarWidget extends AppWidgetProvider {
     Map<String, Double> expenses = parseCategories(expenseJson);
     Map<String, Double> income = parseCategories(incomeJson);
 
-    // Hardcoded list of all possible categories to ensure fixed axes
+    // Calculate Totals
+    double totalExpense = 0;
+    for (Double val : expenses.values())
+      totalExpense += val;
+
+    double totalIncome = 0;
+    for (Double val : income.values())
+      totalIncome += val;
+
+    double balance = totalIncome - totalExpense;
+
+    // Update Text Views
+    views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
+    views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
+    views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
+
+    // Calculate chart
+    Bitmap chartBitmap = createRadarChartBitmap(context, expenses, income);
+    views.setImageViewBitmap(R.id.img_radar_chart, chartBitmap);
+
+    appWidgetManager.updateAppWidget(appWidgetId, views);
+  }
+
+  private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
+      Map<String, Double> income) {
+    int width = 500; // Increased resolution
+    int height = 500;
+    Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    Canvas canvas = new Canvas(bitmap);
+
+    // Config
+    float centerX = width / 2f;
+    float centerY = height / 2f;
+    float radius = Math.min(centerX, centerY) * 0.65f; // Slightly smaller to fit icons
+
+    // Colors
+    int colorExpense = Color.parseColor("#FF5252");
+    int colorIncome = Color.parseColor("#33D499");
+    int colorGrid = Color.parseColor("#33FFFFFF");
+
+    Paint paint = new Paint();
+    paint.setAntiAlias(true);
+
+    // Hardcoded list of all possible categories
     List<String> allCategories = new ArrayList<>();
     allCategories.add("Nómina");
     allCategories.add("Comida");
@@ -105,31 +125,29 @@ public class RadarWidget extends AppWidgetProvider {
       canvas.drawPath(gridPath, paintGrid);
     }
 
-    // Axes & Labels (Emojis)
-    Paint paintEmoji = new Paint();
-    paintEmoji.setTextSize(40f);
-    paintEmoji.setTextAlign(Paint.Align.CENTER);
-    paintEmoji.setAntiAlias(true);
-
+    // Axes & Icons
     for (int j = 0; j < sides; j++) {
       float angle = j * angleStep - (float) Math.PI / 2;
       float x = centerX + (float) Math.cos(angle) * radius;
       float y = centerY + (float) Math.sin(angle) * radius;
 
-      // Draw axis line (solid or dashed? keeping solid for axis looks better, or
-      // dashed if user strictly wants dashed lines. Let's make internal grid dashed,
-      // axes solid or light)
-      // User said "lineas discontinuas", usually refers to the grid.
+      // Draw axis line
       canvas.drawLine(centerX, centerY, x, y, paintGrid);
 
-      // Labels (Emojis)
-      float labelRadius = radius * 1.25f;
+      // Icons
+      float labelRadius = radius * 1.2f;
       float lx = centerX + (float) Math.cos(angle) * labelRadius;
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
-      String emoji = getEmojiForCategory(allCategories.get(j));
-      // Adjust ly slightly for vertical centering of text
-      canvas.drawText(emoji, lx, ly + 14, paintEmoji);
+      int iconResId = getIconResourceForCategory(allCategories.get(j));
+      Drawable icon = context.getDrawable(iconResId);
+      if (icon != null) {
+        icon.setTint(Color.WHITE);
+        int iconSize = 48; // px
+        int iconHalf = iconSize / 2;
+        icon.setBounds((int) lx - iconHalf, (int) ly - iconHalf, (int) lx + iconHalf, (int) ly + iconHalf);
+        icon.draw(canvas);
+      }
     }
 
     // Draw Expense Data
@@ -208,24 +226,35 @@ public class RadarWidget extends AppWidgetProvider {
     }
   }
 
-  private static String getEmojiForCategory(String category) {
+  @Override
+  public void onReceive(Context context, Intent intent) {
+    super.onReceive(context, intent);
+    if (intent.getAction() != null && intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_UPDATE)) {
+      AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(context);
+      ComponentName thisAppWidget = new ComponentName(context.getPackageName(), RadarWidget.class.getName());
+      int[] appWidgetIds = appWidgetManager.getAppWidgetIds(thisAppWidget);
+      onUpdate(context, appWidgetManager, appWidgetIds);
+    }
+  }
+
+  private static int getIconResourceForCategory(String category) {
     switch (category) {
       case "Nómina":
-        return "💰";
+        return R.drawable.ic_cat_nomina;
       case "Comida":
-        return "🍔";
+        return R.drawable.ic_cat_comida;
       case "Negocios":
-        return "💼";
+        return R.drawable.ic_cat_negocios;
       case "Gasolina":
-        return "⛽";
+        return R.drawable.ic_cat_gasolina;
       case "Ropa":
-        return "👕";
+        return R.drawable.ic_cat_ropa;
       case "Salud":
-        return "⚕️";
+        return R.drawable.ic_cat_salud;
       case "Otros":
-        return "ℹ️";
+        return R.drawable.ic_cat_otros;
       default:
-        return "•";
+        return R.drawable.ic_cat_otros;
     }
   }
 }
