@@ -52,10 +52,13 @@ public class BalanceWidget extends AppWidgetProvider {
       }
 
       // --- Radar Chart ---
-      Bitmap chartBitmap = createRadarChartBitmap(context);
-      if (chartBitmap != null) {
-        views.setImageViewBitmap(R.id.img_chart, chartBitmap);
-      }
+      // Removed from BalanceWidget in favor of dedicated RadarWidget
+      /*
+       * Bitmap chartBitmap = createRadarChartBitmap(context);
+       * if (chartBitmap != null) {
+       * views.setImageViewBitmap(R.id.img_chart, chartBitmap);
+       * }
+       */
 
     } catch (Exception e) {
       // Ignore
