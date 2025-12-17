@@ -50,10 +50,13 @@ public class RadarWidget extends AppWidgetProvider {
 
       double balance = totalIncome - totalExpense;
 
-      // Update Text Views
-      views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
-      views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
-      views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
+      // Update Text Views - Disabled for simplified layout (revert)
+      // views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY,
+      // "%.2f €", balance));
+      // views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+
+      // %.2f €", totalIncome));
+      // views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "-
+      // %.2f €", totalExpense));
 
       // Calculate chart
       Bitmap chartBitmap = createRadarChartBitmap(context, expenses, income);
