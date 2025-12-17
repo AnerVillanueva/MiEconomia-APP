@@ -13,8 +13,7 @@
         android:textColor="#B3FFFFFF"
         android:textSize="10sp"
         android:textStyle="bold"
-        android:gravity="center"
-        android:letterSpacing="0.1"/>
+        android:gravity="center" />
 
     <TextView
         android:id="@+id/widget_balance"

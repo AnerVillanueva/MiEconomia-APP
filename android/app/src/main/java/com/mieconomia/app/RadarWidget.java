@@ -50,13 +50,10 @@ public class RadarWidget extends AppWidgetProvider {
 
       double balance = totalIncome - totalExpense;
 
-      // Update Text Views - Disabled for simplified layout (revert)
-      // views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY,
-      // "%.2f €", balance));
-      // views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+
-      // %.2f €", totalIncome));
-      // views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "-
-      // %.2f €", totalExpense));
+      // Update Text Views
+      views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
+      views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
+      views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
 
       // Calculate chart
       Bitmap chartBitmap = createRadarChartBitmap(context, expenses, income);
@@ -72,8 +69,8 @@ public class RadarWidget extends AppWidgetProvider {
 
   private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
       Map<String, Double> income) {
-    int width = 180; // Significantly reduced for IPC safety
-    int height = 180;
+    int width = 280; // Optimized for balance between quality and performance
+    int height = 280;
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
 
@@ -144,7 +141,7 @@ public class RadarWidget extends AppWidgetProvider {
       canvas.drawLine(centerX, centerY, x, y, paintGrid);
 
       // Icons
-      float labelRadius = radius * 1.2f;
+      float labelRadius = radius * 1.25f;
       float lx = centerX + (float) Math.cos(angle) * labelRadius;
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
@@ -154,7 +151,7 @@ public class RadarWidget extends AppWidgetProvider {
         if (icon != null) {
           icon = androidx.core.graphics.drawable.DrawableCompat.wrap(icon).mutate();
           androidx.core.graphics.drawable.DrawableCompat.setTint(icon, Color.WHITE);
-          int iconSize = 48; // px
+          int iconSize = 28; // Smaller proportional size
           int iconHalf = iconSize / 2;
           icon.setBounds((int) lx - iconHalf, (int) ly - iconHalf, (int) lx + iconHalf, (int) ly + iconHalf);
           icon.draw(canvas);

@@ -1,28 +1,98 @@
-<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/widget_background"
-    android:gravity="center"
-    android:orientation="vertical"
+    android:orientation="horizontal"
+    android:weightSum="1.0"
     android:padding="8dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:text="GASTOS vs INGRESOS"
-        android:textColor="#80FFFFFF"
-        android:textSize="10sp"
-        android:textStyle="bold" />
-
-    <ImageView
-        android:id="@+id/img_radar_chart"
-        android:layout_width="match_parent"
+    <!-- Information Section (Left) -->
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="match_parent"
-        android:layout_weight="1"
-        android:scaleType="fitCenter"
-        android:contentDescription="Grafico de Radar" />
+        android:layout_weight="0.35"
+        android:gravity="center_vertical"
+        android:orientation="vertical"
+        android:paddingRight="4dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BALANCE"
+            android:textColor="#B3FFFFFF"
+            android:textSize="10sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_balance"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:layout_marginBottom="8dp"
+            android:text="0,00 €"
+            android:textColor="@android:color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/widget_income"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_btn_income"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp"
+            android:text="+ 0,00 €"
+            android:textColor="#33D499"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="6dp" />
+
+        <TextView
+            android:id="@+id/widget_expense"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/widget_btn_expense"
+            android:paddingLeft="8dp"
+            android:paddingTop="3dp"
+            android:paddingRight="8dp"
+            android:paddingBottom="3dp"
+            android:text="- 0,00 €"
+            android:textColor="#FF5252"
+            android:textSize="11sp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+
+    <!-- Radar Chart Section (Right) -->
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="0.65"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:text="GASTOS vs INGRESOS"
+            android:textColor="#80FFFFFF"
+            android:textSize="9sp"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/img_radar_chart"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:scaleType="fitCenter"
+            android:contentDescription="Grafico de Radar" />
+
+    </LinearLayout>
 
 </LinearLayout>
 
