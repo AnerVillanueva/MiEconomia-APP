@@ -28,43 +28,49 @@ public class RadarWidget extends AppWidgetProvider {
   static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
       int appWidgetId) {
 
-    RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.radar_widget);
+    try {
+      RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.radar_widget);
 
-    // Read Data
-    SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
-    String expenseJson = prefs.getString("widget_expense_categories", "{}");
-    String incomeJson = prefs.getString("widget_income_categories", "{}");
+      // Read Data
+      SharedPreferences prefs = context.getSharedPreferences("CapacitorStorage", Context.MODE_PRIVATE);
+      String expenseJson = prefs.getString("widget_expense_categories", "{}");
+      String incomeJson = prefs.getString("widget_income_categories", "{}");
 
-    Map<String, Double> expenses = parseCategories(expenseJson);
-    Map<String, Double> income = parseCategories(incomeJson);
+      Map<String, Double> expenses = parseCategories(expenseJson);
+      Map<String, Double> income = parseCategories(incomeJson);
 
-    // Calculate Totals
-    double totalExpense = 0;
-    for (Double val : expenses.values())
-      totalExpense += val;
+      // Calculate Totals
+      double totalExpense = 0;
+      for (Double val : expenses.values())
+        totalExpense += val;
 
-    double totalIncome = 0;
-    for (Double val : income.values())
-      totalIncome += val;
+      double totalIncome = 0;
+      for (Double val : income.values())
+        totalIncome += val;
 
-    double balance = totalIncome - totalExpense;
+      double balance = totalIncome - totalExpense;
 
-    // Update Text Views
-    views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
-    views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
-    views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
+      // Update Text Views
+      views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
+      views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
+      views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
 
-    // Calculate chart
-    Bitmap chartBitmap = createRadarChartBitmap(context, expenses, income);
-    views.setImageViewBitmap(R.id.img_radar_chart, chartBitmap);
+      // Calculate chart
+      Bitmap chartBitmap = createRadarChartBitmap(context, expenses, income);
+      if (chartBitmap != null) {
+        views.setImageViewBitmap(R.id.img_radar_chart, chartBitmap);
+      }
 
-    appWidgetManager.updateAppWidget(appWidgetId, views);
+      appWidgetManager.updateAppWidget(appWidgetId, views);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
       Map<String, Double> income) {
-    int width = 500; // Increased resolution
-    int height = 500;
+    int width = 300; // Reduced resolution for performance/IPC limits
+    int height = 300;
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
 
