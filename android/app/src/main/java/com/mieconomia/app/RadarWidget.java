@@ -51,6 +51,8 @@ public class RadarWidget extends AppWidgetProvider {
       double balance = totalIncome - totalExpense;
 
       // Update Text Views
+      // Using plain string concatenation/format to ensure compatibility and
+      // robustness
       views.setTextViewText(R.id.widget_balance, String.format(Locale.GERMANY, "%.2f €", balance));
       views.setTextViewText(R.id.widget_income, String.format(Locale.GERMANY, "+ %.2f €", totalIncome));
       views.setTextViewText(R.id.widget_expense, String.format(Locale.GERMANY, "- %.2f €", totalExpense));
@@ -69,25 +71,27 @@ public class RadarWidget extends AppWidgetProvider {
 
   private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
       Map<String, Double> income) {
-    int width = 240; // Safer resolution
-    int height = 240;
+
+    // Resolution: 320px is crisp for widgets (matches ~160dp density at 2x) and
+    // safe for IPC (<500KB)
+    int width = 320;
+    int height = 320;
+
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
 
     // Config
     float centerX = width / 2f;
     float centerY = height / 2f;
-    float radius = Math.min(centerX, centerY) * 0.65f; // Slightly smaller to fit icons
+    // Radius implies padding. .65 leaves comfortable room for icons.
+    float radius = Math.min(centerX, centerY) * 0.65f;
 
     // Colors
     int colorExpense = Color.parseColor("#FF5252");
     int colorIncome = Color.parseColor("#33D499");
-    int colorGrid = Color.parseColor("#33FFFFFF");
+    int colorGrid = Color.parseColor("#40FFFFFF"); // Slightly clearer grid
 
-    Paint paint = new Paint();
-    paint.setAntiAlias(true);
-
-    // Hardcoded list of all possible categories
+    // Hardcoded list of categories - must match exactly 7 axes for symmetry
     List<String> allCategories = new ArrayList<>();
     allCategories.add("Nómina");
     allCategories.add("Comida");
@@ -97,25 +101,31 @@ public class RadarWidget extends AppWidgetProvider {
     allCategories.add("Salud");
     allCategories.add("Otros");
 
-    double maxValue = 100; // Default minimum max
+    double maxValue = 100;
     for (Double val : expenses.values())
       maxValue = Math.max(maxValue, val);
     for (Double val : income.values())
       maxValue = Math.max(maxValue, val);
 
-    // Draw Grid
     int sides = allCategories.size();
     float angleStep = (float) (2 * Math.PI / sides);
 
-    // Grid Paint (Solid to verify stability)
+    // --- Draw Grid (Spider Web) ---
     Paint paintGrid = new Paint();
     paintGrid.setStyle(Paint.Style.STROKE);
     paintGrid.setColor(colorGrid);
     paintGrid.setStrokeWidth(2f);
-    // paintGrid.setPathEffect(new android.graphics.DashPathEffect(new float[] {
-    // 10f, 10f }, 0f));
     paintGrid.setAntiAlias(true);
 
+    // Attempt dash effect safely
+    try {
+      paintGrid.setPathEffect(new android.graphics.DashPathEffect(new float[] { 10f, 10f }, 0f));
+    } catch (Exception e) {
+      // Fallback to solid line if dash effect fails on this device (rare but
+      // possible)
+    }
+
+    // Concentric rings (1/3, 2/3, 3/3 of radius)
     for (int i = 1; i <= 3; i++) {
       float r = radius * (i / 3f);
       Path gridPath = new Path();
@@ -132,41 +142,44 @@ public class RadarWidget extends AppWidgetProvider {
       canvas.drawPath(gridPath, paintGrid);
     }
 
-    // Axes & Icons
+    // --- Draw Axes & Icons ---
     for (int j = 0; j < sides; j++) {
       float angle = j * angleStep - (float) Math.PI / 2;
       float x = centerX + (float) Math.cos(angle) * radius;
       float y = centerY + (float) Math.sin(angle) * radius;
 
-      // Draw axis line
+      // Draw axis line (spoke)
       canvas.drawLine(centerX, centerY, x, y, paintGrid);
 
-      // Icons
-      float labelRadius = radius * 1.25f;
+      // Icon Position
+      float labelRadius = radius * 1.3f; // Distance from center
       float lx = centerX + (float) Math.cos(angle) * labelRadius;
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
+      // Draw Icon
       int iconResId = getIconResourceForCategory(allCategories.get(j));
       try {
         Drawable icon = androidx.core.content.ContextCompat.getDrawable(context, iconResId);
         if (icon != null) {
+          // Mutate to avoid tinting the original resource cache
           icon = androidx.core.graphics.drawable.DrawableCompat.wrap(icon).mutate();
           androidx.core.graphics.drawable.DrawableCompat.setTint(icon, Color.WHITE);
-          int iconSize = 28; // Smaller proportional size
+
+          int iconSize = 32; // Good size for 320px canvas
           int iconHalf = iconSize / 2;
           icon.setBounds((int) lx - iconHalf, (int) ly - iconHalf, (int) lx + iconHalf, (int) ly + iconHalf);
           icon.draw(canvas);
         }
       } catch (Exception e) {
-        // Skip this icon if it fails to load/draw
+        // If icon fails, just skip it (invisible)
       }
     }
 
-    // Draw Expense Data
-    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, expenses, maxValue, colorExpense, 80);
-
-    // Draw Income Data
-    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, income, maxValue, colorIncome, 80);
+    // --- Draw Data Polygons ---
+    // Expense (Red)
+    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, expenses, maxValue, colorExpense, 90);
+    // Income (Green)
+    drawPoly(canvas, centerX, centerY, radius, sides, angleStep, allCategories, income, maxValue, colorIncome, 90);
 
     return bitmap;
   }
