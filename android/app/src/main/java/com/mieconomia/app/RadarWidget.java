@@ -69,8 +69,8 @@ public class RadarWidget extends AppWidgetProvider {
 
   private static Bitmap createRadarChartBitmap(Context context, Map<String, Double> expenses,
       Map<String, Double> income) {
-    int width = 300; // Reduced resolution for performance/IPC limits
-    int height = 300;
+    int width = 180; // Significantly reduced for IPC safety
+    int height = 180;
     Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
     Canvas canvas = new Canvas(bitmap);
 
