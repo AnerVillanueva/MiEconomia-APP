@@ -146,13 +146,18 @@ public class RadarWidget extends AppWidgetProvider {
       float ly = centerY + (float) Math.sin(angle) * labelRadius;
 
       int iconResId = getIconResourceForCategory(allCategories.get(j));
-      Drawable icon = context.getDrawable(iconResId);
-      if (icon != null) {
-        icon.setTint(Color.WHITE);
-        int iconSize = 48; // px
-        int iconHalf = iconSize / 2;
-        icon.setBounds((int) lx - iconHalf, (int) ly - iconHalf, (int) lx + iconHalf, (int) ly + iconHalf);
-        icon.draw(canvas);
+      try {
+        Drawable icon = androidx.core.content.ContextCompat.getDrawable(context, iconResId);
+        if (icon != null) {
+          icon = androidx.core.graphics.drawable.DrawableCompat.wrap(icon).mutate();
+          androidx.core.graphics.drawable.DrawableCompat.setTint(icon, Color.WHITE);
+          int iconSize = 48; // px
+          int iconHalf = iconSize / 2;
+          icon.setBounds((int) lx - iconHalf, (int) ly - iconHalf, (int) lx + iconHalf, (int) ly + iconHalf);
+          icon.draw(canvas);
+        }
+      } catch (Exception e) {
+        // Skip this icon if it fails to load/draw
       }
     }
 
